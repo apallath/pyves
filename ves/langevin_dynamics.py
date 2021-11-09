@@ -1,5 +1,6 @@
 """
-Convenience classes for performing langevin dynamics simulations using OpenMM.
+Classes for performing langevin dynamics simulations with VES bias
+using OpenMM.
 """
 import multiprocessing
 import pickle
@@ -9,10 +10,13 @@ from openmm import unit
 from openmm import openmm
 from tqdm import tqdm
 
+from ves.bias import Bias
+
 
 class SingleParticleSimulation:
     """
-    Performs langevin dynamics simulation of a particle on a 2D potential energy surface.
+    Performs langevin dynamics simulation of a particle on a 2D potential energy surface
+    with an optional VES bias.
     """
     def __init__(self,
                  potential: openmm.CustomExternalForce,
@@ -22,7 +26,8 @@ class SingleParticleSimulation:
                  timestep: float = 10,
                  init_state: openmm.State = None,
                  init_coord: np.ndarray = np.array([0, 0, 0]).reshape((1, 3)),
-                 gpu: bool = False):
+                 gpu: bool = False,
+                 seed=None):
         # Properties
         self.mass = mass * unit.dalton  # mass of particles
         self.temp = temp * unit.kelvin  # temperature
@@ -39,7 +44,11 @@ class SingleParticleSimulation:
         self.potential.addParticle(0, [])  # no parameters associated with each particle
         self.system.addForce(potential)
 
-        self.integrator = openmm.LangevinIntegrator(self.temp, self.friction, self.timestep)
+        self.integrator = openmm.LangevinIntegrator(self.temp,
+                                                    self.friction,
+                                                    self.timestep)
+        if seed is not None:
+            self.integrator.setRandomNumberSeed(seed)
 
         if self.gpu:
             platform = openmm.Platform.getPlatformByName('CUDA')
@@ -54,9 +63,37 @@ class SingleParticleSimulation:
         # Init state
         if init_state is None:
             self.context.setPositions(init_coord)
-            self.context.setVelocitiesToTemperature(self.temp)
+            if seed is not None:
+                self.context.setVelocitiesToTemperature(self.temp, randomSeed=seed)
+            else:
+                self.context.setVelocitiesToTemperature(self.temp)
         else:
             self.context.setState(init_state)
+
+        # By default, the simulation is not biased
+        self.biased = False
+
+    def init_ves(self,
+                 bias: Bias,
+                 static: bool = False,
+                 startafter: int = 50,
+                 learnevery: int = 50):
+        """
+        Initialize simulation with VES bias.
+        """
+        self.biased = True
+
+        if static:
+            self.static = True
+            self.startafter = startafter
+            self.learnevery = learnevery
+        else:
+            self.static = False
+            self.startafter = None
+            self.learnevery = None
+
+        self.bias = bias
+        self.update_on = False
 
     def __call__(self,
                  nsteps: int = 1000,
@@ -72,6 +109,53 @@ class SingleParticleSimulation:
         self.KE = []
 
         for i in tqdm(range(nsteps)):
+            ####################################################################
+            # Begin VES mod
+            #
+            # OpenMM-related notes
+            # ** During update steps, previous force needs to be removed by
+            #    index and a new one needs to be added
+            # ** The simulation Context needs to be re-initialized after
+            #    modifying the system (i.e. adding or removing forces)
+            #
+            ####################################################################
+            if self.biased:
+                if not self.static:
+                    # Repeat updates
+                    if i == self.startafter:
+                        # Get position history
+                        traj = self.context.getState(getPositions=True).getPositions(asNumpy=True).value_in_unit(unit.nanometer)
+                        # Update bias
+                        self.bias.update(traj)
+                        # Add bias force, and store index
+                        self.bias_force_idx = self.system.addForce(self.bias.force)
+                        # Re-initialize context
+                        self.context.reinitialize()
+
+                    elif i % self.learnevery == 0:
+                        # Do not repeat update @ startevery (=> elif)
+
+                        # Get position history
+                        traj = self.context.getState(getPositions=True).getPositions(asNumpy=True).value_in_unit(unit.nanometer)
+                        # Update bias
+                        self.bias.update(traj)
+                        # Remove existing bias force
+                        self.system.removeForce(self.bias_force_idx)
+                        # Add updated bias force, and store index
+                        self.bias_force_idx = self.system.addForce(self.bias.force)
+
+                else:
+                    # Do this only at the first timestep
+                    if i == 0:
+                        # Add force, and store index
+                        self.bias_force_idx = self.system.addForce(self.bias.force)
+                        # Re-initialize context
+                        self.context.reinitialize()
+
+            ####################################################################
+            # End VES mod
+            ####################################################################
+
             # Checkpoint
             if i % chkevery == 0:
                 self.dump_state(chkfile)
