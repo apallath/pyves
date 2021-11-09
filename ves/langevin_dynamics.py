@@ -53,10 +53,12 @@ class SingleParticleSimulation:
         if self.gpu:
             platform = openmm.Platform.getPlatformByName('CUDA')
             properties = {'CudaPrecision': 'mixed'}
+            print("Running simulation on GPU.")
         else:
             platform = openmm.Platform.getPlatformByName('CPU')
             num_threads = str(multiprocessing.cpu_count())
             properties = {'Threads': num_threads}
+            print("Running simulation on {} CPU threads.".format(num_threads))
 
         self.context = openmm.Context(self.system, self.integrator, platform, properties)
 
@@ -76,7 +78,7 @@ class SingleParticleSimulation:
     def init_ves(self,
                  bias: Bias,
                  static: bool = False,
-                 startafter: int = 50,
+                 startafter: int = 0,
                  learnevery: int = 50):
         """
         Initialize simulation with VES bias.
@@ -102,7 +104,8 @@ class SingleParticleSimulation:
                  energyevery: int = 1,
                  chkfile="./chk_state.pkl",
                  trajfile="./traj.dat",
-                 energyfile="./energies.dat"):
+                 energyfile="./energies.dat",
+                 ves_update_params={}):
         # Data
         self.traj = None
         self.PE = []
@@ -123,34 +126,42 @@ class SingleParticleSimulation:
                 if not self.static:
                     # Repeat updates
                     if i == self.startafter:
+                        # I/O
+                        print("[VES] {} bias: Initializing dynamic bias at timestep {}.".format(type(self.bias).__name__, i))
                         # Get position history
                         traj = self.context.getState(getPositions=True).getPositions(asNumpy=True).value_in_unit(unit.nanometer)
                         # Update bias
-                        self.bias.update(traj)
+                        self.bias.update(traj, **ves_update_params)
                         # Add bias force, and store index
                         self.bias_force_idx = self.system.addForce(self.bias.force)
                         # Re-initialize context
-                        self.context.reinitialize()
+                        self.context.reinitialize(preserveState=True)
 
                     elif i % self.learnevery == 0:
                         # Do not repeat update @ startevery (=> elif)
 
+                        # I/O
+                        print("[VES] {} bias: Updating dynamic bias at timestep {}.".format(type(self.bias).__name__, i))
                         # Get position history
                         traj = self.context.getState(getPositions=True).getPositions(asNumpy=True).value_in_unit(unit.nanometer)
                         # Update bias
-                        self.bias.update(traj)
+                        self.bias.update(traj, **ves_update_params)
                         # Remove existing bias force
                         self.system.removeForce(self.bias_force_idx)
                         # Add updated bias force, and store index
                         self.bias_force_idx = self.system.addForce(self.bias.force)
+                        # Re-initialize context
+                        self.context.reinitialize(preserveState=True)
 
                 else:
                     # Do this only at the first timestep
                     if i == 0:
+                        # I/O
+                        print("[VES] {} bias: Initializing static bias.".format(type(self.bias).__name__))
                         # Add force, and store index
                         self.bias_force_idx = self.system.addForce(self.bias.force)
                         # Re-initialize context
-                        self.context.reinitialize()
+                        self.context.reinitialize(preserveState=True)
 
             ####################################################################
             # End VES mod

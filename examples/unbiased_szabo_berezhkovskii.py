@@ -1,7 +1,8 @@
 import os
 
 import matplotlib.pyplot as plt
-import numpy as np
+
+from ves.config_creation import singleParticle2D_init_coord
 from ves.langevin_dynamics import SingleParticleSimulation
 from ves.visualization import VisualizePotential2D
 from ves.potentials import SzaboBerezhkovskiiPotential as SBPotential
@@ -19,26 +20,14 @@ if not os.path.exists("unbiased_szabo_berezhkovskii_files/"):
 
 plt.savefig("unbiased_szabo_berezhkovskii_files/potential.png")
 
-#Importance sampling to place particle on potential energy surface
-init_coord = None
-for i in range(100):
-    trial_coord = [15 * np.random.random() - 7.5,
-                   15 * np.random.random() - 7.5,
-                   0]
-    beta = 1 / (8.3145 / 1000 * temp)
-    boltzmann_factor = np.exp(-beta * pot.potential(trial_coord[0], trial_coord[1]))
-    if boltzmann_factor >= 0.5:
-        init_coord = trial_coord
-        print("Particle placement succeeded at iteration {}".format(i))
-        break
-
-if init_coord is None:
-    raise RuntimeError("Could not place particle on surface.")
-
-init_coord = np.array(init_coord).reshape((1, 3))
+# Monte carlo trials to place particle on potential energy surface
+init_coord = singleParticle2D_init_coord(pot, 300, xmin=-7.5, xmax=7.5,
+                                         ymin=-7.5, ymax=7.5)
 
 # Perform single particle simulation
 sim = SingleParticleSimulation(pot, init_coord=init_coord)
+
+
 sim(nsteps=10000,
     chkevery=2000,
     trajevery=1,

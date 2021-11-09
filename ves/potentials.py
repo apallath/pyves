@@ -16,7 +16,7 @@ class Potential2D(openmm.CustomExternalForce):
         self.force += "+ 1000 * z^2"
 
         # Print force expression
-        print(self.force)
+        print("[Potential] Initializing potential with expression:\n" + self.force)
 
         # Initialize force expression
         super().__init__(self.force)
