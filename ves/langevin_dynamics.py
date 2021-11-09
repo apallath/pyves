@@ -78,7 +78,7 @@ class SingleParticleSimulation:
     def init_ves(self,
                  bias: Bias,
                  static: bool = False,
-                 startafter: int = 0,
+                 startafter: int = 2,
                  learnevery: int = 50):
         """
         Initialize simulation with VES bias.
@@ -87,12 +87,14 @@ class SingleParticleSimulation:
 
         if static:
             self.static = True
-            self.startafter = startafter
-            self.learnevery = learnevery
-        else:
-            self.static = False
             self.startafter = None
             self.learnevery = None
+        else:
+            self.static = False
+            if startafter < 2:
+                raise ValueError("Cannot start VES updates before timestep 2.")
+            self.startafter = startafter
+            self.learnevery = learnevery
 
         self.bias = bias
         self.update_on = False
@@ -128,24 +130,20 @@ class SingleParticleSimulation:
                     if i == self.startafter:
                         # I/O
                         print("[VES] {} bias: Initializing dynamic bias at timestep {}.".format(type(self.bias).__name__, i))
-                        # Get position history
-                        traj = self.context.getState(getPositions=True).getPositions(asNumpy=True).value_in_unit(unit.nanometer)
                         # Update bias
-                        self.bias.update(traj, **ves_update_params)
+                        self.bias.update(self.traj, **ves_update_params)
                         # Add bias force, and store index
                         self.bias_force_idx = self.system.addForce(self.bias.force)
                         # Re-initialize context
                         self.context.reinitialize(preserveState=True)
 
-                    elif i % self.learnevery == 0:
+                    if i > self.startafter and i % self.learnevery == 0:
                         # Do not repeat update @ startevery (=> elif)
 
                         # I/O
                         print("[VES] {} bias: Updating dynamic bias at timestep {}.".format(type(self.bias).__name__, i))
-                        # Get position history
-                        traj = self.context.getState(getPositions=True).getPositions(asNumpy=True).value_in_unit(unit.nanometer)
                         # Update bias
-                        self.bias.update(traj, **ves_update_params)
+                        self.bias.update(self.traj, **ves_update_params)
                         # Remove existing bias force
                         self.system.removeForce(self.bias_force_idx)
                         # Add updated bias force, and store index

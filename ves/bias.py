@@ -20,6 +20,12 @@ class Bias:
         torch_force = TorchForce(self.model_loc)
         return torch_force
 
+###############################################################################
+# Simple harmonic potential bias
+# E.g.: umbrella sampling along the x-coordinate
+# No updates to the bias
+###############################################################################
+
 
 class HarmonicBias_SingleParticle_x(Bias):
     """
@@ -27,12 +33,6 @@ class HarmonicBias_SingleParticle_x(Bias):
     """
     def __init__(self, k, x0, model_loc="model.pt"):
         super().__init__(model_loc)
-        module = torch.jit.script(HarmonicBias_SingleParticle_x_ForceModule(k, x0))
-        module.save(self.model_loc)
-
-    def update(self, traj, k, x0):
-        # Ignore traj variable
-        # Set harmonic bias at new location
         module = torch.jit.script(HarmonicBias_SingleParticle_x_ForceModule(k, x0))
         module.save(self.model_loc)
 
@@ -62,6 +62,13 @@ class HarmonicBias_SingleParticle_x_ForceModule(torch.nn.Module):
         return self.k / 2 * torch.sum((positions[:, 0] - self.x0) ** 2)
 
 
+###############################################################################
+# VES (Valsson and Parrinello 2014)
+# Applied potential V is an expansion over a basis set
+# The update() setup updates the coefficients
+###############################################################################
+
+
 class BasisSetExpansionBias_SingleParticle_x(Bias):
     """
     Apply a basis set expanded potential along the x coordinate of a single particle.
@@ -71,6 +78,12 @@ class BasisSetExpansionBias_SingleParticle_x(Bias):
 
     def update(self, traj):
         pass
+
+###############################################################################
+# VES (Valsson and Parrinello 2014)
+# Applied potential V is a neural network
+# The update() setup updates the NN parameters
+###############################################################################
 
 
 class NeuralNetworkBias_SingleParticle_x(Bias):

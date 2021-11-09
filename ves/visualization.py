@@ -33,7 +33,7 @@ class VisualizePotential2D:
 
     def plot_potential(self):
         """
-        Plots the potential within (xrange[0], xrange[1]) and (yrange[0], yrange[1])
+        Plots the potential within (xrange[0], xrange[1]) and (yrange[0], yrange[1]).
         """
         grid_width = max(self.xrange[1] - self.xrange[0], self.yrange[1] - self.yrange[0]) / self.mesh
         xx, yy = np.mgrid[self.xrange[0]:self.xrange[1]:grid_width, self.yrange[0]:self.yrange[1]:grid_width]
@@ -50,13 +50,26 @@ class VisualizePotential2D:
         ax.set_ylabel("$y$")
         return (fig, ax)
 
+    def plot_projection(self):
+        pass
+
     def scatter_traj(self, traj, outimg, every=1, s=1, c='black'):
+        """
+        Scatters entire trajectory onto potential energy surface.
+        """
         fig, ax = self.plot_potential()
         ax.scatter(traj[::every, 0], traj[::every, 1], s=s, c=c)
         plt.savefig(outimg)
         plt.close()
 
+    def scatter_traj_projection(self, traj, outimg, every=1, s=1, c='black'):
+        pass
+
     def animate_traj(self, traj, outdir, every=1, s=3, c='black', call_ffmpeg: bool = True):
+        """
+        Plots positions at timesteps defined by interval `every` on potential
+        energy surface and stitches together plots using ffmpeg to make a movie.
+        """
         if not os.path.exists(outdir):
             os.makedirs(outdir)
 
@@ -68,3 +81,7 @@ class VisualizePotential2D:
 
         if call_ffmpeg:
             os.system("ffmpeg -r 25 -i {}/traj.%5d.png -vb 20M {}/traj.mp4".format(outdir, outdir))
+
+    def animate_traj_projection(self, traj, outdir, every=1, s=3, c='black',
+                                call_ffmpeg: bool = True):
+        pass

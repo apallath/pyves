@@ -13,7 +13,7 @@ class Potential2D(openmm.CustomExternalForce):
     def __init__(self):
         # Apply restraining potential along z direction
         # Child classes will add terms for x and y and initialize this force expression
-        self.force += "+ 1000 * z^2"
+        self.force += " + 1000 * z^2"
 
         # Print force expression
         print("[Potential] Initializing potential with expression:\n" + self.force)
@@ -31,7 +31,7 @@ class Potential2D(openmm.CustomExternalForce):
 
 class SzaboBerezhkovskiiPotential(Potential2D):
     """
-    2D Szabo-Berezhkovskii potential
+    2D Szabo-Berezhkovskii potential.
     """
     # Constants that define the potential function
     x0 = 2.2
@@ -47,7 +47,7 @@ class SzaboBerezhkovskiiPotential(Potential2D):
                      "Delta": self.Delta}
 
         self.force = '''{Omega2} * 0.5 * (x - y)^2'''.format(**constvals)
-        self.force += '''+ (select(step(x + 0.5 * {x0}), select(step(x - 0.5 * {x0}), -{Delta} + {omega2} * 0.5 * (x - {x0})^2, -{omega2} * 0.5 * x^2), -{Delta} + {omega2} * 0.5 * (x + {x0})^2))'''.format(**constvals)
+        self.force += ''' + (select(step(x + 0.5 * {x0}), select(step(x - 0.5 * {x0}), -{Delta} + {omega2} * 0.5 * (x - {x0})^2, -{omega2} * 0.5 * x^2), -{Delta} + {omega2} * 0.5 * (x + {x0})^2))'''.format(**constvals)
 
         super().__init__()
 
