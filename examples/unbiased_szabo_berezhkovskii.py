@@ -7,6 +7,9 @@ from ves.langevin_dynamics import SingleParticleSimulation
 from ves.visualization import VisualizePotential2D
 from ves.potentials import SzaboBerezhkovskiiPotential as SBPotential
 
+if not os.path.exists("unbiased_szabo_berezhkovskii_files/"):
+    os.makedirs("unbiased_szabo_berezhkovskii_files/")
+
 # Create and visualize potential energy surface
 pot = SBPotential()
 temp = 300
@@ -14,10 +17,6 @@ vis = VisualizePotential2D(pot, temp=temp,
                            xrange=[-7.5, 7.5], yrange=[-7.5, 7.5],
                            contourvals=[-2, -1, 0, 1, 2, 5, 8, 10])
 fig, ax = vis.plot_potential()
-
-if not os.path.exists("unbiased_szabo_berezhkovskii_files/"):
-    os.makedirs("unbiased_szabo_berezhkovskii_files/")
-
 plt.savefig("unbiased_szabo_berezhkovskii_files/potential.png")
 
 # Monte carlo trials to place particle on potential energy surface

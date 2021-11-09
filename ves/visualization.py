@@ -50,7 +50,12 @@ class VisualizePotential2D:
         ax.set_ylabel("$y$")
         return (fig, ax)
 
-    def plot_projection(self):
+    def plot_projection_x(self):
+        """
+        Plots the projection of potential within (xrange[0], xrange[1])
+        and (yrange[0], yrange[1]) onto the x-axis.
+        """
+        # TODO: integrate over free energy surface
         pass
 
     def scatter_traj(self, traj, outimg, every=1, s=1, c='black'):
@@ -62,7 +67,7 @@ class VisualizePotential2D:
         plt.savefig(outimg)
         plt.close()
 
-    def scatter_traj_projection(self, traj, outimg, every=1, s=1, c='black'):
+    def scatter_traj_projection_x(self, traj, outimg, every=1, s=1, c='black'):
         pass
 
     def animate_traj(self, traj, outdir, every=1, s=3, c='black', call_ffmpeg: bool = True):
@@ -82,6 +87,6 @@ class VisualizePotential2D:
         if call_ffmpeg:
             os.system("ffmpeg -r 25 -i {}/traj.%5d.png -vb 20M {}/traj.mp4".format(outdir, outdir))
 
-    def animate_traj_projection(self, traj, outdir, every=1, s=3, c='black',
+    def animate_traj_projection_x(self, traj, outdir, every=1, s=3, c='black',
                                 call_ffmpeg: bool = True):
         pass

@@ -1,5 +1,5 @@
 """
-Classes defining VES bias potentials and update mechanism
+Classes defining VES bias potentials
 """
 from openmmtorch import TorchForce
 import torch
