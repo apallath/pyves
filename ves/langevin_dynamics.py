@@ -5,8 +5,8 @@ import multiprocessing
 import pickle
 
 import numpy as np
-from simtk import unit
-from simtk.openmm import openmm
+from openmm import unit
+from openmm import openmm
 from tqdm import tqdm
 
 
@@ -21,6 +21,7 @@ class SingleParticleSimulation:
                  friction: float = 100,
                  timestep: float = 10,
                  init_state: openmm.State = None,
+                 init_coord: np.ndarray = np.array([0, 0, 0]).reshape((1, 3)),
                  gpu: bool = False):
         # Properties
         self.mass = mass * unit.dalton  # mass of particles
@@ -31,16 +32,11 @@ class SingleParticleSimulation:
         self.init_state = init_state
         self.gpu = gpu
 
-        # Number of particles
-        # Fixed
-        n = 1
-
         # Init simulation objects
         self.system = openmm.System()
         self.potential = potential
-        for i in range(n):
-            self.system.addParticle(self.mass)
-            self.potential.addParticle(i, [])  # no parameters associated with each particle
+        self.system.addParticle(self.mass)
+        self.potential.addParticle(0, [])  # no parameters associated with each particle
         self.system.addForce(potential)
 
         self.integrator = openmm.LangevinIntegrator(self.temp, self.friction, self.timestep)
@@ -57,7 +53,6 @@ class SingleParticleSimulation:
 
         # Init state
         if init_state is None:
-            init_coord = (np.random.rand(n, 3) * np.array([12, 12, 0]) + np.array([-6, -6, 0]))
             self.context.setPositions(init_coord)
             self.context.setVelocitiesToTemperature(self.temp)
         else:
