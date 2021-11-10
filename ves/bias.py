@@ -6,6 +6,7 @@ import torch
 import torch.optim as optim
 import torch.nn as nn
 
+torch.set_default_tensor_type(torch.DoubleTensor)
 
 class Bias:
     """
@@ -54,8 +55,8 @@ class HarmonicBias_SingleParticle_x_ForceModule(torch.nn.Module):
         """The forward method returns the energy computed from positions.
 
         Args:
-            positions : torch.Tensor with shape (nparticles, 3)
-                positions[i,k] is the position (in nanometers) of spatial dimension k of particle i
+            positions : torch.Tensor with shape (3,)
+                positions[k] is the position (in nanometers) of spatial dimension k of particle
 
         Returns:
             potential : torch.Scalar
@@ -97,6 +98,8 @@ class VESBias_SingleParticle_x(Bias):
         else:
             raise ValueError("Requested optimizer not yet supported.")
 
+        super().__init__(model_loc)
+
     def update(self, traj):
         ########################################################################
         # Training loop with one optimizer step
@@ -108,23 +111,26 @@ class VESBias_SingleParticle_x(Bias):
         # Evaluate biased part of loss
         # Accumulate loss over entire trajectory
         # TODO: Add support for different averaging methods
-        eBV = torch.tensor([0.0], requires_grad=True)
+        eBV = torch.tensor([[0.0]], requires_grad=True)
+        eBV_sum = eBV.clone()
         for t in range(traj.shape[0]):
-            x = torch.tensor(traj[t])
-            eBV += torch.exp(self.beta * self.model(x))
-        loss_V = 1 / self.beta * torch.log(eBV)
+            x = torch.tensor([traj[t]])
+            eBV_sum += torch.exp(self.beta * self.model(x))
+        loss_V = 1 / self.beta * torch.log(eBV_sum)
 
         # Evaluate target part of loss
         # Accumulate loss over target x
-        loss_p = torch.tensor([0.0], requires_grad=True)
-        for i in range(len(self.target.x)):
-            loss_p += self.target.p[i] * self.model(self.target.x[i])
+        loss_p = torch.tensor([[0.0]], requires_grad=True)
+        loss_p_sum = loss_p.clone()
+
+        x_target = torch.from_numpy(self.target.x)
+        p_target = torch.from_numpy(self.target.p)
+
+        for i in range(len(x_target)):
+            loss_p_sum += torch.tensor([p_target[i]]) * self.model(x_target[i].reshape((1, 1)))
 
         # Sum loss
-        loss = loss_V + loss_p
-
-        # Track loss
-        print(loss)
+        loss = loss_V + loss_p_sum
 
         # Backprop to compute gradients
         loss.backward()
@@ -140,6 +146,11 @@ class VESBias_SingleParticle_x(Bias):
         # Archive model for future retrieval
         module.save(self.model_loc + ".iter{}".format(traj.shape[0]))
 
+        ########################################################################
+        # Reporters
+        ########################################################################
+        # TODO: add reporters
+
 
 ################################################################################
 # Bias potential zoo
@@ -151,29 +162,30 @@ class VESBias_SingleParticle_x_ForceModule_NN(torch.nn.Module):
     """
     Neural network bias with [16, 32, 64] architecture.
     """
-    def __init__(self, basis_set_layer):
+    def __init__(self):
         super().__init__()
 
-        self.fc1 = nn.linear(1, 16)
+        self.fc1 = nn.Linear(1, 16)
         self.tanh1 = nn.Tanh()
-        self.fc2 = nn.linear(16, 32)
+        self.fc2 = nn.Linear(16, 32)
         self.tanh2 = nn.Tanh()
-        self.fc3 = nn.linear(32, 64)
+        self.fc3 = nn.Linear(32, 64)
         self.tanh3 = nn.Tanh()
-        self.fc4 = nn.linear(64, 1)
+        self.fc4 = nn.Linear(64, 1)
 
     def forward(self, positions):
         """The forward method returns the energy computed from positions.
 
         Args:
-            positions : torch.Tensor with shape (nparticles, 3)
-                positions[i,k] is the position (in nanometers) of spatial dimension k of particle i
+            positions : torch.Tensor with shape (1, 3)
+                positions[0, k] is the position (in nanometers) of spatial dimension k of particle 0
 
         Returns:
             potential : torch.Scalar
                 The potential energy (in kJ/mol)
         """
         # Extract x-coordinate
+        positions.shape
         x = positions[:, 0]
 
         # Apply NN bias
