@@ -3,7 +3,8 @@ Classes defining VES bias potentials and update mechanism
 """
 from openmmtorch import TorchForce
 import torch
-import torch.optim
+import torch.optim as optim
+import torch.nn as nn
 
 
 class Bias:
@@ -64,25 +65,35 @@ class HarmonicBias_SingleParticle_x_ForceModule(torch.nn.Module):
 
 
 ###############################################################################
-# VES (Valsson and Parrinello 2014)
-# Applied potential V is an expansion over a basis set
+# VES bias
+# Applied potential V can either be:
+# a) an expansion over a basis set (Valsson and Parrinello 2014)
+# b) a neural network (Valsson and Parrinello 2014)
+# This needs to be passed as an input parameter
 # The update() setup updates the coefficients
 ###############################################################################
 
 
-class BasisSetExpansionBias_SingleParticle_x(Bias):
+class VESBias_SingleParticle_x(Bias):
     """
     Apply a basis set expanded potential along the x coordinate of a single particle.
     """
-    def __init__(self, basis_set_layer, optimizer_type, optimizer_params, model_loc):
-        self.model = BasisSetExpansionBias_SingleParticle_x_ForceModule(basis_set_layer)
+    def __init__(self, V_module, target, beta, optimizer_type, optimizer_params, model_loc):
+        # Bias potential V(x)
+        self.model = V_module
+
+        # Target distribution p(x)
+        self.target = target
+
+        # Required for computing loss function
+        self.beta = beta
 
         if optimizer_type == 'SGD':
-            self.optimizer = torch.optim.SGD(self.model.parameters(), **optimizer_params)
+            self.optimizer = optim.SGD(self.model.parameters(), **optimizer_params)
         elif optimizer_type == 'RMSprop':
-            self.optimizer = torch.optim.RMSprop(self.model.parameters(), **optimizer_params)
+            self.optimizer = optim.RMSprop(self.model.parameters(), **optimizer_params)
         elif optimizer_type == 'Adam':
-            self.optimizer = torch.optim.Adam(self.model.parameters(), **optimizer_params)
+            self.optimizer = optim.Adam(self.model.parameters(), **optimizer_params)
         else:
             raise ValueError("Requested optimizer not yet supported.")
 
@@ -95,11 +106,23 @@ class BasisSetExpansionBias_SingleParticle_x(Bias):
         self.optimizer.zero_grad()
 
         # Evaluate biased part of loss
-        # Accumulate gradients
-        loss = None
+        # Accumulate loss
+        eBV = torch.tensor([0.0], requires_grad=True)
+        for t in range(traj.shape[0]):
+            x = torch.tensor(traj[t])
+            eBV += torch.exp(self.beta * self.model(x))
+        loss_V = 1 / self.beta * torch.log(eBV)
 
         # Evaluate target part of loss
-        # Accumulate gradients
+        # Accumulate loss
+        loss_p = torch.tensor([0.0], requires_grad=True)
+        # TODO: accumulate loss
+
+        # Sum loss
+        loss = loss_V + loss_p
+
+        # Track loss
+        print(loss)
 
         # Backprop to compute gradients
         loss.backward()
@@ -112,12 +135,26 @@ class BasisSetExpansionBias_SingleParticle_x(Bias):
         module.save(self.model_loc)
 
 
-class BasisSetExpansionBias_SingleParticle_x_ForceModule(torch.nn.Module):
+################################################################################
+# Bias potential zoo
+# Add new bias potential forms here
+################################################################################
+
+
+class VESBias_SingleParticle_x_ForceModule_NN(torch.nn.Module):
     """
-    Basis set expansion bias.
+    Neural network bias with [16, 32, 64] architecture.
     """
     def __init__(self, basis_set_layer):
         super().__init__()
+
+        self.fc1 = nn.linear(1, 16)
+        self.tanh1 = nn.Tanh()
+        self.fc2 = nn.linear(16, 32)
+        self.tanh2 = nn.Tanh()
+        self.fc3 = nn.linear(32, 64)
+        self.tanh3 = nn.Tanh()
+        self.fc4 = nn.linear(64, 1)
 
     def forward(self, positions):
         """The forward method returns the energy computed from positions.
@@ -131,27 +168,16 @@ class BasisSetExpansionBias_SingleParticle_x_ForceModule(torch.nn.Module):
                 The potential energy (in kJ/mol)
         """
         # Extract x-coordinate
-        xpos = positions[:, 0]
+        x = positions[:, 0]
 
-        # Apply bias to x-coordinate
-        bias = self.V(xpos)
+        # Apply NN bias
+        bias = self.fc1(x)
+        bias = self.tanh1(bias)
+        bias = self.fc2(bias)
+        bias = self.tanh2(bias)
+        bias = self.fc3(bias)
+        bias = self.tanh3(bias)
+        bias = self.fc4(bias)
 
         # Return bias
         return bias
-
-###############################################################################
-# VES (Valsson and Parrinello 2014)
-# Applied potential V is a neural network
-# The update() setup updates the NN parameters
-###############################################################################
-
-
-class NeuralNetworkBias_SingleParticle_x(Bias):
-    """
-    Apply a neural network bias potential along the x coordinate of a single particle.
-    """
-    def __init__(self, NN, model_loc):
-        pass
-
-    def update(self, traj):
-        pass
