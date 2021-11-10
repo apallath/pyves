@@ -22,9 +22,9 @@ class Target_x:
 
 class Target_Uniform_HardSwitch_x(Target_x):
     """
-    Distribution is uniform over interval [x_min, x_max]. Outside of this, it is zero.
+    Distribution is uniform over interval [-1, 1]. Outside of this, it is zero.
     """
-    def __init__(self, x_min, x_max, mesh):
+    def __init__(self, mesh):
         super().__init__()
-        self._x = np.linspace(x_min, x_max, mesh)
-        self._p = 1 / (x_max - x_min) * np.ones(self._x.shape)
+        self._x = np.linspace(-1, 1, mesh)
+        self._p = 1 / 2 * np.ones(self._x.shape)

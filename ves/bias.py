@@ -23,11 +23,11 @@ class Bias:
         torch_force = TorchForce(self.model_loc)
         return torch_force
 
-###############################################################################
+################################################################################
 # Simple harmonic potential bias
 # E.g.: umbrella sampling along the x-coordinate
 # No updates to the bias
-###############################################################################
+################################################################################
 
 
 class HarmonicBias_SingleParticle_x(Bias):
@@ -55,8 +55,8 @@ class HarmonicBias_SingleParticle_x_ForceModule(torch.nn.Module):
         """The forward method returns the energy computed from positions.
 
         Args:
-            positions : torch.Tensor with shape (3,)
-                positions[k] is the position (in nanometers) of spatial dimension k of particle
+            positions : torch.Tensor with shape (1, 3)
+                positions[0, k] is the position (in nanometers) of spatial dimension k of particle 0
 
         Returns:
             potential : torch.Scalar
@@ -65,23 +65,27 @@ class HarmonicBias_SingleParticle_x_ForceModule(torch.nn.Module):
         return self.k / 2 * torch.sum((positions[:, 0] - self.x0) ** 2)
 
 
-###############################################################################
+################################################################################
 # VES bias
 # Applied potential V can either be:
 # a) an expansion over a basis set (Valsson and Parrinello 2014)
 # b) a neural network (Valsson and Parrinello 2014)
 # This needs to be passed as an input parameter
 # The update() setup updates the coefficients
-###############################################################################
+################################################################################
 
 
 class VESBias_SingleParticle_x(Bias):
     """
     Apply a basis set expanded potential along the x coordinate of a single particle.
     """
-    def __init__(self, V_module, target, beta, optimizer_type, optimizer_params, model_loc):
+    def __init__(self, V_module, x_min, x_max, target, beta, optimizer_type, optimizer_params, model_loc):
         # Bias potential V(x)
         self.model = V_module
+
+        # Scaling parameters
+        self.x_min = x_min
+        self.x_max = x_max
 
         # Target distribution p(x)
         self.target = target
@@ -105,6 +109,9 @@ class VESBias_SingleParticle_x(Bias):
         # Training loop with one optimizer step
         ########################################################################
 
+        # Scale traj
+        traj = traj / (self.x_max - self.x_min) + self.x_min
+
         # Zero gradients
         self.optimizer.zero_grad()
 
@@ -114,8 +121,8 @@ class VESBias_SingleParticle_x(Bias):
         eBV = torch.tensor([[0.0]], requires_grad=True)
         eBV_sum = eBV.clone()
         for t in range(traj.shape[0]):
-            x = torch.tensor([traj[t]])
-            eBV_sum += torch.exp(self.beta * self.model(x))
+            xyz = torch.tensor(traj[t]).reshape((1, 3))
+            eBV_sum += torch.exp(self.beta * self.model(xyz))
         loss_V = 1 / self.beta * torch.log(eBV_sum)
 
         # Evaluate target part of loss
@@ -132,6 +139,9 @@ class VESBias_SingleParticle_x(Bias):
         # Sum loss
         loss = loss_V + loss_p_sum
 
+        # Print loss
+        print("Loss = {:.6f}".format(loss.detach().numpy()[0, 0]))
+
         # Backprop to compute gradients
         loss.backward()
 
@@ -146,11 +156,6 @@ class VESBias_SingleParticle_x(Bias):
         # Archive model for future retrieval
         module.save(self.model_loc + ".iter{}".format(traj.shape[0]))
 
-        ########################################################################
-        # Reporters
-        ########################################################################
-        # TODO: add reporters
-
 
 ################################################################################
 # Bias potential zoo
@@ -160,18 +165,16 @@ class VESBias_SingleParticle_x(Bias):
 
 class VESBias_SingleParticle_x_ForceModule_NN(torch.nn.Module):
     """
-    Neural network bias with [16, 32, 64] architecture.
+    Neural network bias with [48, 24, 1] architecture.
     """
     def __init__(self):
         super().__init__()
 
-        self.fc1 = nn.Linear(1, 16)
-        self.tanh1 = nn.Tanh()
-        self.fc2 = nn.Linear(16, 32)
-        self.tanh2 = nn.Tanh()
-        self.fc3 = nn.Linear(32, 64)
-        self.tanh3 = nn.Tanh()
-        self.fc4 = nn.Linear(64, 1)
+        self.fc1 = nn.Linear(1, 48)
+        self.act1 = nn.ReLU()
+        self.fc2 = nn.Linear(48, 24)
+        self.act2 = nn.ReLU()
+        self.fc3 = nn.Linear(24, 1)
 
     def forward(self, positions):
         """The forward method returns the energy computed from positions.
@@ -185,17 +188,14 @@ class VESBias_SingleParticle_x_ForceModule_NN(torch.nn.Module):
                 The potential energy (in kJ/mol)
         """
         # Extract x-coordinate
-        positions.shape
         x = positions[:, 0]
 
         # Apply NN bias
         bias = self.fc1(x)
-        bias = self.tanh1(bias)
+        bias = self.act1(bias)
         bias = self.fc2(bias)
-        bias = self.tanh2(bias)
+        bias = self.act2(bias)
         bias = self.fc3(bias)
-        bias = self.tanh3(bias)
-        bias = self.fc4(bias)
 
         # Return bias
         return bias
