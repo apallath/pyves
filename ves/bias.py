@@ -3,6 +3,7 @@ Classes defining VES bias potentials and update mechanism
 """
 from openmmtorch import TorchForce
 import torch
+import torch.optim
 
 
 class Bias:
@@ -73,11 +74,70 @@ class BasisSetExpansionBias_SingleParticle_x(Bias):
     """
     Apply a basis set expanded potential along the x coordinate of a single particle.
     """
-    def __init__(self, BasisSet, model_loc):
-        pass
+    def __init__(self, basis_set_layer, optimizer_type, optimizer_params, model_loc):
+        self.model = BasisSetExpansionBias_SingleParticle_x_ForceModule(basis_set_layer)
+
+        if optimizer_type == 'SGD':
+            self.optimizer = torch.optim.SGD(self.model.parameters(), **optimizer_params)
+        elif optimizer_type == 'RMSprop':
+            self.optimizer = torch.optim.RMSprop(self.model.parameters(), **optimizer_params)
+        elif optimizer_type == 'Adam':
+            self.optimizer = torch.optim.Adam(self.model.parameters(), **optimizer_params)
+        else:
+            raise ValueError("Requested optimizer not yet supported.")
 
     def update(self, traj):
-        pass
+        ########################################################################
+        # Training loop with one optimizer step
+        ########################################################################
+
+        # Zero gradients
+        self.optimizer.zero_grad()
+
+        # Evaluate biased part of loss
+        # Accumulate gradients
+        loss = None
+
+        # Evaluate target part of loss
+        # Accumulate gradients
+
+        # Backprop to compute gradients
+        loss.backward()
+
+        # Make an optimizer step
+        self.optimizer.step()
+
+        # Save updated model as torchscript
+        module = torch.jit.script(self.model)
+        module.save(self.model_loc)
+
+
+class BasisSetExpansionBias_SingleParticle_x_ForceModule(torch.nn.Module):
+    """
+    Basis set expansion bias.
+    """
+    def __init__(self, basis_set_layer):
+        super().__init__()
+
+    def forward(self, positions):
+        """The forward method returns the energy computed from positions.
+
+        Args:
+            positions : torch.Tensor with shape (nparticles, 3)
+                positions[i,k] is the position (in nanometers) of spatial dimension k of particle i
+
+        Returns:
+            potential : torch.Scalar
+                The potential energy (in kJ/mol)
+        """
+        # Extract x-coordinate
+        xpos = positions[:, 0]
+
+        # Apply bias to x-coordinate
+        bias = self.V(xpos)
+
+        # Return bias
+        return bias
 
 ###############################################################################
 # VES (Valsson and Parrinello 2014)
