@@ -106,7 +106,8 @@ class VESBias_SingleParticle_x(Bias):
         self.optimizer.zero_grad()
 
         # Evaluate biased part of loss
-        # Accumulate loss
+        # Accumulate loss over entire trajectory
+        # TODO: Add support for different averaging methods
         eBV = torch.tensor([0.0], requires_grad=True)
         for t in range(traj.shape[0]):
             x = torch.tensor(traj[t])
@@ -114,9 +115,10 @@ class VESBias_SingleParticle_x(Bias):
         loss_V = 1 / self.beta * torch.log(eBV)
 
         # Evaluate target part of loss
-        # Accumulate loss
+        # Accumulate loss over target x
         loss_p = torch.tensor([0.0], requires_grad=True)
-        # TODO: accumulate loss
+        for i in range(len(self.target.x)):
+            loss_p += self.target.p[i] * self.model(self.target.x[i])
 
         # Sum loss
         loss = loss_V + loss_p
@@ -131,8 +133,12 @@ class VESBias_SingleParticle_x(Bias):
         self.optimizer.step()
 
         # Save updated model as torchscript
+        # Overwrite last model
         module = torch.jit.script(self.model)
         module.save(self.model_loc)
+
+        # Archive model for future retrieval
+        module.save(self.model_loc + ".iter{}".format(traj.shape[0]))
 
 
 ################################################################################
