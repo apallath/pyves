@@ -67,7 +67,7 @@ if fit_nn:
         output = nn_fn(x_scale)
         # print(output.detach().numpy().shape)
         # print(Fx.numpy()[:,:,0].shape)
-        loss = loss_fn(output, Fx_scale[:,:,0])
+        loss = loss_fn(output, Fx_scale[:, :, 0])
         losses.append(loss.detach().numpy())
 
         loss.backward()
@@ -90,7 +90,7 @@ if fit_nn:
     # End: Fit neural network to 1D projection
     ################################################################################
 
-run_sim = True
+run_sim = False
 if run_sim:
     # Monte carlo trials to place particle on potential energy surface
     init_coord = singleParticle2D_init_coord(pot, 300, xmin=-7.5, xmax=7.5,
@@ -149,7 +149,7 @@ if not os.path.exists('deepves_szabo_berezhkovskii_files/deepves_bias_movie'):
 
 print("Plotting bias evolution...")
 
-for iter in tqdm(iters):
+for iteridx, iter in enumerate(tqdm(iters)):
     fig, ax, x, Fx = vis.plot_projection_x()
 
     # Standardize input
@@ -169,11 +169,12 @@ for iter in tqdm(iters):
 
     # Save to file
     plt.savefig('deepves_szabo_berezhkovskii_files/deepves_bias_movie/iter{}.png'.format(iter))
+    plt.savefig('deepves_szabo_berezhkovskii_files/deepves_bias_movie/iter.{:05d}.png'.format(iteridx))
 
     # Close
     plt.close()
 
-os.system("ffmpeg -r 25 -i deepves_szabo_berezhkovskii_files/deepves_bias_movie/iter%d.png -vb 20M deepves_szabo_berezhkovskii_files/deepves_bias_movie/movie.mp4")
+os.system("ffmpeg -r 25 -i deepves_szabo_berezhkovskii_files/deepves_bias_movie/iter.%05d.png -vb 20M deepves_szabo_berezhkovskii_files/deepves_bias_movie/movie.mp4")
 
 ################################################################################
 # Begin: End VES bias evolution
