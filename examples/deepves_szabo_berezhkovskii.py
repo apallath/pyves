@@ -6,7 +6,8 @@ import numpy as np
 import torch
 from tqdm import tqdm
 
-from ves.bias import VESBias_SingleParticle_x, VESBias_SingleParticle_x_ForceModule_NN
+from ves.basis import NNBasis
+from ves.bias import VESBias_SingleParticle_x
 from ves.config_creation import singleParticle2D_init_coord
 from ves.langevin_dynamics import SingleParticleSimulation
 from ves.potentials import SzaboBerezhkovskiiPotential as SBPotential
@@ -54,7 +55,7 @@ if fit_nn:
 
     x_scale = torch.tensor(x_scale).reshape((len(x_scale), 1, 1))
     Fx_scale = torch.tensor(Fx_scale).reshape((len(Fx_scale), 1, 1))
-    nn_fn = VESBias_SingleParticle_x_ForceModule_NN()
+    nn_fn = NNBasis()
     loss_fn = torch.nn.MSELoss()
     optimizer = torch.optim.Adam(nn_fn.parameters(), lr=0.002)
 
@@ -104,7 +105,7 @@ if run_sim:
     ################################################################################
     beta = 1 / (8.3145 / 1000 * temp)
     target = Target_Uniform_HardSwitch_x(200)
-    V_module = VESBias_SingleParticle_x_ForceModule_NN()
+    V_module = NNBasis()
 
     ves_bias = VESBias_SingleParticle_x(V_module,
                                         -7.5, 7.5,

@@ -4,9 +4,10 @@ Classes defining VES bias potentials and update mechanism
 from openmmtorch import TorchForce
 import torch
 import torch.optim as optim
-import torch.nn as nn
+
 
 torch.set_default_tensor_type(torch.DoubleTensor)
+
 
 class Bias:
     """
@@ -155,47 +156,3 @@ class VESBias_SingleParticle_x(Bias):
 
         # Archive model for future retrieval
         module.save(self.model_loc + ".iter{}".format(traj.shape[0]))
-
-
-################################################################################
-# Bias potential zoo
-# Add new bias potential forms here
-################################################################################
-
-
-class VESBias_SingleParticle_x_ForceModule_NN(torch.nn.Module):
-    """
-    Neural network bias with [48, 24, 1] architecture.
-    """
-    def __init__(self):
-        super().__init__()
-
-        self.fc1 = nn.Linear(1, 48)
-        self.act1 = nn.ReLU()
-        self.fc2 = nn.Linear(48, 24)
-        self.act2 = nn.ReLU()
-        self.fc3 = nn.Linear(24, 1)
-
-    def forward(self, positions):
-        """The forward method returns the energy computed from positions.
-
-        Args:
-            positions : torch.Tensor with shape (1, 3)
-                positions[0, k] is the position (in nanometers) of spatial dimension k of particle 0
-
-        Returns:
-            potential : torch.Scalar
-                The potential energy (in kJ/mol)
-        """
-        # Extract x-coordinate
-        x = positions[:, 0]
-
-        # Apply NN bias
-        bias = self.fc1(x)
-        bias = self.act1(bias)
-        bias = self.fc2(bias)
-        bias = self.act2(bias)
-        bias = self.fc3(bias)
-
-        # Return bias
-        return bias

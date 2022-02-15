@@ -3,6 +3,7 @@ Class defining VES target free energy landscape
 """
 import numpy as np
 
+
 class Target_x:
     """
     Abstract class defining VES target probability distribution.
