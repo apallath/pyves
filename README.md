@@ -9,7 +9,7 @@ graph LR;
 
     2[Choose Target]-->C(Uniform distribution);
     2-->D(Well-tempered distribution)-->D1[Choose bias factor];
-    D-->D2[Choose localization]
+    D-->D2[Choose free energy localization]
     D2-->D2A(No localization)
     D2-->D2B(Localized with sigmoidal cutoff)
 
@@ -20,8 +20,8 @@ graph LR;
     E-->E4(Moving window average)-->E4A[Choose window size]
 
     3-->F[Choose optimizer]
-    F-->F1(Torch optimizers)
-    F-->F2(VES 2nd order optimizer)
+    F-->F1(Stochastic PyTorch optimizers)
+    F-->F2(Original VES 2nd order optimizer)
 
     3-->G[Choose learning rate]
     G-->G1[Choose learning rate decay]
