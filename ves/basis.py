@@ -24,16 +24,24 @@ class LegendreBasis_x(nn.Module):
         and the Bonnet's recursion formula:
         $$(n + 1) P_{n+1}(x) = (2n + 1) x P_n(x) - nP_{n-1}(x)$$
         """
-        P = torch.ones(x.size(0), degree + 1, requires_grad=True).type(x.type())
+        if degree == 0:
+            return torch.ones(x.size(0), requires_grad=True).type(x.type())
 
-        # P[:, 0] = 1
+        elif degree == 1:
+            return x
 
-        if degree > 0:
-            P[:, 1] = x
+        elif degree > 1:
+            P_n_minus = torch.ones(x.size(0), requires_grad=True).type(x.type())
+            P_n = x
+
             for n in range(1, degree):
-                P[:, n + 1] = ((2 * n + 1) * x * P[:, n] - n * P[:, n - 1]) / (n + 1)
+                P_n_plus = ((2 * n + 1) * x * P_n - n * P_n_minus) / (n + 1)
 
-        return P[:, degree]
+                # Replace
+                P_n_minus = P_n
+                P_n = P_n_plus
+
+        return P_n
 
     def forward(self, positions):
         """The forward method returns the energy computed from positions.
