@@ -4,11 +4,50 @@ Classes defining potential energy surfaces.
 import numpy as np
 from openmm import openmm
 
+################################################################################
+# 2D potentials
+################################################################################
+
+
+class Potential1D(openmm.CustomExternalForce):
+    """
+    Abstract class defining basic 1D potential energy behavior.
+    """
+    def __init__(self):
+        # Apply restraining potential along z direction
+        # Child classes will add terms for x and y and initialize this force expression
+        self.force += " + 1000 * y^2 + 1000 * z^2"
+
+        # Print force expression
+        print("[Potential] Initializing potential with expression:\n" + self.force)
+
+        # Initialize force expression
+        super().__init__(self.force)
+
+    def potential(self, x: float):
+        """
+        Computes the potential at a given point x.
+        """
+        # Child classes will implement this method.
+        pass
+
+
+class GaussianPotential1D(Potential1D):
+    pass
+
+
+class DoubleWellPotential1D(Potential1D):
+    pass
+
+
+################################################################################
+# 2D potentials
+################################################################################
+
 
 class Potential2D(openmm.CustomExternalForce):
     """
-    Abstract class defining basic 2D potential energy behavior and plotting
-    functions.
+    Abstract class defining basic 2D potential energy behavior.
     """
     def __init__(self):
         # Apply restraining potential along z direction
@@ -27,6 +66,15 @@ class Potential2D(openmm.CustomExternalForce):
         """
         # Child classes will implement this method.
         pass
+
+
+class GaussianPotential2D(Potential2D):
+    pass
+
+
+
+class DoubleWellPotential2D(Potential2D):
+    pass
 
 
 class SzaboBerezhkovskiiPotential(Potential2D):
@@ -61,3 +109,7 @@ class SzaboBerezhkovskiiPotential(Potential2D):
                            lambda x: -self.omega2 * x ** 2 / 2.0,
                            lambda x: -self.Delta + self.omega2 * (x - self.x0) ** 2 / 2.0])
         return (Ux + self.Omega2 * (x - y) ** 2 / 2.0)
+
+
+class MullerBrownPotential(Potential2D):
+    pass

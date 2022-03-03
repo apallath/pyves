@@ -9,10 +9,84 @@ import numpy as np
 from scipy.special import logsumexp
 from tqdm import tqdm
 
+from ves.potentials import Potential1D
 from ves.potentials import Potential2D
 
 # Resource-light and SSH-friendly non-GUI plotting
 matplotlib.use('Agg')
+
+
+class VisualizePotential1D:
+    def __init__(self,
+                 potential1D: Potential1D,
+                 temp: float,
+                 xrange: tuple,
+                 mesh: int = 200):
+        self.potential1D = potential1D
+        self.kT = 8.3145 / 1000 * temp
+        self.xrange = xrange
+        self.mesh = mesh
+
+    def plot_potential(self):
+        """
+        Plots the potential within (xrange[0], xrange[1]).
+        """
+        x = np.linspace(self.xrange[0], self.xrange[1], self.mesh)
+        V = self.potential1D.potential(x) / self.kT
+
+        # Plot
+        fig, ax = plt.subplots(dpi=150)
+        ax.plot(x, V)
+        ax.set_ylabel(r"Free energy ($k_B T$)")
+        ax.set_xlabel("$x$")
+        ax.set_ylim([0, None])
+        return (fig, ax)
+
+    def scatter_traj(self, traj, outimg, every=1, s=1, c='black'):
+        """
+        Scatters entire trajectory onto potential energy surface.
+        """
+        fig, ax = self.plot_potential()
+        for i in tqdm(range(0, traj.shape[0], every)):
+            xpt = traj[i, 0]
+            ypt = self.potential1D.potential(xpt) / self.kT
+            ax.scatter(xpt, ypt, s=s, c=c)
+        plt.savefig(outimg)
+        plt.close()
+
+    def animate_traj(self, traj, outdir, every=1, s=3, c='black', call_ffmpeg: bool = True):
+        """
+        Plots positions at timesteps defined by interval `every` on potential
+        energy surface and stitches together plots using ffmpeg to make a movie.
+        """
+        if not os.path.exists(outdir):
+            os.makedirs(outdir)
+
+        for t, frame in enumerate(tqdm(traj[::every])):
+            fig, ax = self.plot_potential()
+            ax.scatter(frame[0], frame[1], s=s, c=c)
+            plt.savefig("{}/traj.{:05d}.png".format(outdir, t))
+            plt.close()
+
+        if call_ffmpeg:
+            os.system("ffmpeg -r 25 -i {}/traj.%5d.png -vb 20M {}/traj.mp4".format(outdir, outdir))
+
+    def animate_traj_projection_x(self, traj, outdir, every=1, s=3, c='black',
+                                call_ffmpeg: bool = True):
+        if not os.path.exists(outdir):
+            os.makedirs(outdir)
+
+        for t, frame in enumerate(tqdm(traj[::every])):
+            fig, ax, x, Fx = self.plot_projection_x()
+            xpt = frame[0]
+            yloc = np.argmin((x - xpt)**2)
+            ypt = Fx[yloc]
+            ax.scatter(xpt, ypt, s=s, c=c)
+            plt.savefig("{}/traj_x.{:05d}.png".format(outdir, t))
+            plt.close()
+
+        if call_ffmpeg:
+            os.system("ffmpeg -r 25 -i {}/traj_x.%5d.png -vb 20M {}/traj_x.mp4".format(outdir, outdir))
 
 
 class VisualizePotential2D:
