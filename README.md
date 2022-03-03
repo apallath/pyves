@@ -1,4 +1,4 @@
-# ves-openmm-torch
+# pyves
 
 ## Flowchart of options
 
