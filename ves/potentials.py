@@ -11,7 +11,20 @@ from openmm import openmm
 
 class Potential1D(openmm.CustomExternalForce):
     """
-    Abstract class defining basic 1D potential energy behavior.
+    Abstract class defining basic 1D potential behavior.
+
+    A harmonic restraining potential of magnitude 1000 kJ/mol is applied on the
+    y and z coordinates about y=0 and z=0.
+
+    Note:
+        Child classes must call super.__init__() only after initializing the force
+        attribute in the x variable.
+
+    Attributes:
+        force (str): `OpenMM-compatible custom force expression`_.
+
+    .. _OpenMM-compatible custom force expression:
+       http://docs.openmm.org/latest/userguide/theory/03_custom_forces.html#writing-custom-expressions
     """
     def __init__(self):
         # Apply restraining potential along z direction
@@ -27,16 +40,34 @@ class Potential1D(openmm.CustomExternalForce):
     def potential(self, x: float):
         """
         Computes the potential at a given point x.
+
+        Args:
+            x (float): Point to compute potential at.
+
+        Returns:
+            V (float): Value of potential at x.
         """
         # Child classes will implement this method.
+        raise NotImplementedError()
+
+
+class SingleWellPotential1D(Potential1D):
+    """
+    1D single gaussian well potential.
+    """
+    def __init__(self):
+        self.force = """ """
+
+        super().__init__()
+
+    def potential(self, x):
         pass
 
 
-class GaussianPotential1D(Potential1D):
-    pass
-
-
 class DoubleWellPotential1D(Potential1D):
+    """
+    1D double gaussian well potential.
+    """
     pass
 
 
@@ -47,7 +78,19 @@ class DoubleWellPotential1D(Potential1D):
 
 class Potential2D(openmm.CustomExternalForce):
     """
-    Abstract class defining basic 2D potential energy behavior.
+    Abstract class defining basic 2D potential behavior.
+    A harmonic restraining potential of magnitude 1000 kJ/mol is applied on the
+    z coordinates about z=0.
+
+    Note:
+        Child classes must call super.__init__() only after initializing the force
+        attribute in x and y variables.
+
+    Attributes:
+        force (str): `OpenMM-compatible custom force expression`_.
+
+    .. _OpenMM-compatible custom force expression:
+       http://docs.openmm.org/latest/userguide/theory/03_custom_forces.html#writing-custom-expressions
     """
     def __init__(self):
         # Apply restraining potential along z direction
@@ -63,14 +106,20 @@ class Potential2D(openmm.CustomExternalForce):
     def potential(self, x: float, y: float):
         """
         Computes the potential at a given point (x, y).
+
+        Args:
+            x (float): x-coordinate of the point to compute potential at.
+            y (float): y-coordinate of the point to compute potential at.
+
+        Returns:
+            V (float): Value of potential at (x, y).
         """
         # Child classes will implement this method.
-        pass
+        raise NotImplementedError()
 
 
-class GaussianPotential2D(Potential2D):
+class SingleWellPotential2D(Potential2D):
     pass
-
 
 
 class DoubleWellPotential2D(Potential2D):
@@ -100,7 +149,7 @@ class SzaboBerezhkovskiiPotential(Potential2D):
         super().__init__()
 
     def potential(self, x, y):
-        """Computes the Szabo-Berezhkovskii potential at a given point (x, y)"""
+        """Computes the Szabo-Berezhkovskii potential at a given point (x, y)."""
         Ux = np.piecewise(x,
                           [x <= -self.x0 / 2,
                            np.logical_and(x > -self.x0 / 2, x < self.x0 / 2),
