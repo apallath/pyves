@@ -162,7 +162,7 @@ class VisualizePotential2D:
         V = v.reshape(self.mesh, self.mesh) / self.kT
 
         # Integrate over y-coordinate to get free-energy along x-coordinate
-        Fx = -logsumexp(-V, axis=1)
+        Fx = -logsumexp(-V, axis=0)
         Fx = Fx - np.min(Fx)
         x = np.arange(self.xrange[0], self.xrange[1], grid_width)
 
