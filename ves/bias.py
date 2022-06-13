@@ -1,5 +1,5 @@
 """
-Classes defining VES bias potentials and update mechanism
+Classes defining bias potentials and update mechanisms.
 """
 from openmmtorch import TorchForce
 import torch
@@ -8,32 +8,55 @@ import torch.optim as optim
 
 torch.set_default_tensor_type(torch.DoubleTensor)
 
+################################################################################
+# Analytical biases
+################################################################################
+
 
 class Bias:
     """
-    Abstract class defining methods for VES bias to implement.
+    Abstract class defining biases that can be added to langevin dynamics simulations.
     """
-    def __init__(self, model_loc="model.pt"):
-        self.model_loc = model_loc
+    def __init__(self):
+        pass
 
     def update(self, traj):
         pass
 
     @property
     def force(self):
+        pass
+
+
+class LegendreBias_SingleParticle_x(Bias):
+    """
+    Applies a legendre potential bias along the x coordinate of a single particle.
+    """
+    pass
+
+
+################################################################################
+# Neural network biases
+################################################################################
+
+
+class NNBias(Bias):
+    """
+    Abstract class defining neural network biases.
+    """
+    def __init__(self, model_loc="model.pt"):
+        super().__init__()
+        self.model_loc = model_loc
+
+    @property
+    def force(self):
         torch_force = TorchForce(self.model_loc)
         return torch_force
 
-################################################################################
-# Simple harmonic potential bias
-# E.g.: umbrella sampling along the x-coordinate
-# No updates to the bias
-################################################################################
 
-
-class HarmonicBias_SingleParticle_x(Bias):
+class HarmonicBias_SingleParticle_x(NNBias):
     """
-    Apply a harmonic bias potential along the x coordinate of a single particle.
+    Applies a harmonic bias potential along the x coordinate of a single particle.
     """
     def __init__(self, k, x0, model_loc="model.pt"):
         super().__init__(model_loc)
@@ -66,19 +89,17 @@ class HarmonicBias_SingleParticle_x_ForceModule(torch.nn.Module):
         return self.k / 2 * torch.sum((positions[:, 0] - self.x0) ** 2)
 
 
-################################################################################
-# VES bias
-# Applied potential V can either be:
-# a) an expansion over a basis set (Valsson and Parrinello 2014)
-# b) a neural network (Valsson and Parrinello 2014)
-# This needs to be passed as an input parameter
-# The update() setup updates the coefficients
-################################################################################
-
-
-class VESBias_SingleParticle_x(Bias):
+class VESBias_SingleParticle_x(NNBias):
     """
-    Apply a basis set expanded potential along the x coordinate of a single particle.
+    Applies a basis set expanded potential along the x coordinate of a single particle.
+
+    The potential (V_module) can either be:
+        a) an expansion over a basis set (Valsson and Parrinello 2014).
+        b) a neural network (Valsson and Parrinello 2014).
+
+    Note:
+        Some basis sets (such as the Legendre basis set) can be slow to work with due to the large
+        overhead associated with backpropagation for gradient computation.
     """
     def __init__(self, V_module, x_min, x_max, target, beta, optimizer_type, optimizer_params, model_loc):
         # Bias potential V(x)

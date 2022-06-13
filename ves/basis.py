@@ -1,5 +1,5 @@
 """
-Classes defining various VES basis expansions
+Classes defining VES basis expansions for use with the neural network VES bias.
 """
 import torch
 import torch.nn as nn
@@ -12,6 +12,9 @@ torch.set_default_tensor_type(torch.DoubleTensor)
 class LegendreBasis_x(nn.Module):
     """
     Legendre polynomial basis with user-defined degree.
+
+    Note: the size of the computational graph required to compute gradients
+    increases with the degree of the legendre polynomial.
     """
     def __init__(self, degree):
         self.degree = degree

@@ -1,5 +1,5 @@
 """
-Class defining VES target free energy landscape
+Class defining VES target free energy landscape.
 """
 import numpy as np
 

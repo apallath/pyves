@@ -1,5 +1,5 @@
 """
-Classes for performing langevin dynamics simulations with VES bias
+Classes for performing biased langevin dynamics simulations
 using OpenMM.
 """
 import multiprocessing

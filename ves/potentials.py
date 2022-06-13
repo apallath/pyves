@@ -53,22 +53,28 @@ class Potential1D(openmm.CustomExternalForce):
 
 class SingleWellPotential1D(Potential1D):
     """
-    1D single gaussian well potential.
+    1D single well potential.
     """
     def __init__(self):
-        self.force = """ """
+        self.force = '''x^2'''
 
         super().__init__()
 
     def potential(self, x):
-        pass
+        return x ** 2
 
 
 class DoubleWellPotential1D(Potential1D):
     """
-    1D double gaussian well potential.
+    1D double well potential.
     """
-    pass
+    def __init__(self):
+        self.force = '''x^4 - 4 * x^2 + 0.7 * x'''
+
+        super().__init__()
+
+    def potential(self, x):
+        return x ** 4 - 4 * x ** 2 + 0.7 * x
 
 
 ################################################################################
@@ -79,6 +85,7 @@ class DoubleWellPotential1D(Potential1D):
 class Potential2D(openmm.CustomExternalForce):
     """
     Abstract class defining basic 2D potential behavior.
+
     A harmonic restraining potential of magnitude 1000 kJ/mol is applied on the
     z coordinates about z=0.
 
@@ -119,11 +126,111 @@ class Potential2D(openmm.CustomExternalForce):
 
 
 class SingleWellPotential2D(Potential2D):
-    pass
+    r"""
+    Single well potential.
+
+    $$U(x, y) = x^2 + y^2$$
+    """
+    def __init__(self):
+        self.force = '''x^2 + y^2'''
+
+        super().__init__()
+
+    def potential(self, x, y):
+        """Computes the single well potential at a given point (x, y)."""
+        return x ** 2 + y ** 2
 
 
 class DoubleWellPotential2D(Potential2D):
-    pass
+    r"""
+    Double well potential.
+
+    $$U(x, y) = x^4 - 4 x^2 + 0.7 x + 5 y^2$$
+    """
+    def __init__(self):
+        self.force = '''x^4 - 4 * x^2 + 0.7 * x + 5 * y^2'''
+
+        super().__init__()
+
+    def potential(self, x, y):
+        """Computes the double well potential at a given point (x, y)."""
+        return x ** 4 - 4 * x ** 2 + 0.7 * x + 5 * y ** 2
+
+
+class SlipBondPotential2D(Potential2D):
+    r"""
+    2-basin slip bond potential.
+
+    $$U(x, y) = \left( \left(\frac{(y - y\_0)^2}{y\_scale} - y\_shift \right)^2 + \frac{(x - y - xy\_0)^2}{xy\_scale} \right)$$
+    """
+    def __init__(self, force_x=0, force_y=0, y_0=1, y_scale=5, y_shift=4, xy_0=0, xy_scale=2):
+        self.force_x = force_x
+        self.force_y = force_y
+        self.y_0 = y_0
+        self.y_scale = y_scale
+        self.y_shift = y_shift
+        self.xy_0 = xy_0
+        self.xy_scale = xy_scale
+
+        constvals = {"force_x": self.force_x,
+                     "force_y": self.force_y,
+                     "y_0": self.y_0,
+                     "y_scale": self.y_scale,
+                     "y_shift": self.y_shift,
+                     "xy_0": self.xy_0,
+                     "xy_scale": self.xy_scale}
+
+        self.force = '''((y - {y_0})^2 / {y_scale} - {y_shift})^2 + (x - y - {xy_0})^2 / {xy_scale} - {force_x} * x - {force_y} * y'''.format(**constvals)
+
+        super().__init__()
+
+    def potential(self, x, y):
+        """Computes the slip bond potential at a given point (x, y)."""
+        return ((y - self.y_0) ** 2 / self.y_scale - self.y_shift) ** 2 + (x - y - self.xy_0) ** 2 / self.xy_scale - self.force_x * x - self.force_y * y
+
+
+class CatchBondPotential2D(Potential2D):
+    r"""
+    3-basin catch bond potential (slip bond potential with an extra harmonic basin).
+
+    $$U(x, y) = -\ln \left[ e^{-\left( \left(\frac{(y - y_0)^2}{y_{scale}} - y_{shift} \right)^2 + \frac{(x - y - xy_{shift})^2}{2} \right) }
+    + e^-{(x - gx_0)^2 / gx_scale + (y - gy_0)^2 / gy_scale} \right]$$
+    """
+    def __init__(self, force_x=0, force_y=0, y_0=1, y_scale=5, y_shift=4, xy_0=0, xy_scale=2, gx_0=2, gx_scale=0.5, gy_0=-2.5, gy_scale=0.25):
+        self.force_x = force_x
+        self.force_y = force_y
+        self.y_0 = y_0
+        self.y_scale = y_scale
+        self.y_shift = y_shift
+        self.xy_0 = xy_0
+        self.xy_scale = xy_scale
+
+        # Harmonic basin parameters
+        self.gx_0 = gx_0
+        self.gx_scale = gx_scale
+        self.gy_0 = gy_0
+        self.gy_scale = gy_scale
+
+        constvals = {"force_x": self.force_x,
+                     "force_y": self.force_y,
+                     "y_0": self.y_0,
+                     "y_scale": self.y_scale,
+                     "y_shift": self.y_shift,
+                     "xy_0": self.xy_0,
+                     "xy_scale": self.xy_scale,
+                     "gx_0": self.gx_0,
+                     "gx_scale": self.gx_scale,
+                     "gy_0": self.gy_0,
+                     "gy_scale": self.gy_scale}
+
+        self.force = '''-log(exp(-(((y - {y_0})^2 / {y_scale} - {y_shift})^2 + (x - y - {xy_0})^2 / {xy_scale}) ) + exp(-( (x - {gx_0})^2 / {gx_scale} + (y - {gy_0})^2 / {gy_scale} )) ) - {force_x} * x - {force_y} * y'''.format(**constvals)
+
+        super().__init__()
+
+    def potential(self, x, y):
+        """Computes the catch bond potential at a given point (x, y)."""
+        return -np.log(np.exp(-(((y - self.y_0) ** 2 / self.y_scale - self.y_shift) ** 2 + (x - y - self.xy_0) ** 2 / self.xy_scale)) +
+                       np.exp(-((x - self.gx_0) ** 2 / self.gx_scale + (y - self.gy_0) ** 2 / self.gy_scale))) - self.force_x * x - self.force_y * y
 
 
 class SzaboBerezhkovskiiPotential(Potential2D):
@@ -161,4 +268,37 @@ class SzaboBerezhkovskiiPotential(Potential2D):
 
 
 class MullerBrownPotential(Potential2D):
+    """
+    2D Muller-Brown potential.
+    """
+    a = [-1, -1, -6.5, 0.7]
+    b = [0, 0, 11, 0.6]
+    c = [-10, -10, -6.5, 0.7]
+    A = [-200, -100, -170, 15]
+    x_bar = [1, 0, -0.5, -1]
+    y_bar = [0, 0.5, 1.5, 1]
+
+    def __init__(self):
+        for i in range(4):
+            fmt = dict(a=self.a[i], b=self.b[i], c=self.c[i], A=self.A[i], x_bar=self.x_bar[i], y_bar=self.y_bar[i])
+            if i == 0:
+                self.force = '''{A} * exp({a} * (x - {x_bar})^2 + {b} * (x - {x_bar}) * (y - {y_bar}) + {c} * (y - {y_bar})^2)'''.format(**fmt)
+            else:
+                self.force += ''' + {A} * exp({a} * (x - {x_bar})^2 + {b} * (x - {x_bar}) * (y - {y_bar}) + {c} * (y - {y_bar})^2)'''.format(**fmt)
+
+        super().__init__()
+
+    def potential(self, x, y):
+        """Compute the Muller-Brown potential at a given point (x, y)."""
+        value = 0
+        for i in range(4):
+            value += self.A[i] * np.exp(self.a[i] * (x - self.x_bar[i])**2 +
+                                        self.b[i] * (x - self.x_bar[i]) * (y - self.y_bar[i]) + self.c[i] * (y - self.y_bar[i])**2)
+        return value
+
+
+class WolfeQuappPotential(Potential2D):
+    """
+    2D Wolfe-Quapp potential
+    """
     pass
