@@ -21,9 +21,12 @@ vis = VisualizePotential2D(pot, temp=temp,
 # 2D surface
 fig, ax = vis.plot_potential()
 plt.savefig("harmonic_szabo_berezhkovskii_files/potential.png")
+
 # 1D projection
 fig, ax, _, _ = vis.plot_projection_x()
 plt.savefig("harmonic_szabo_berezhkovskii_files/potential_x.png")
+fig, ax, _, _ = vis.plot_projection_y()
+plt.savefig("harmonic_szabo_berezhkovskii_files/potential_y.png")
 
 # Monte carlo trials to place particle on potential energy surface
 init_coord = singleParticle2D_init_coord(pot, 300, xmin=-7.5, xmax=7.5,
@@ -46,7 +49,9 @@ sim(nsteps=10000,
     energyfile="harmonic_szabo_berezhkovskii_files/energies.dat")
 
 # Visualize trajectory
-vis.scatter_traj(sim.traj, "harmonic_szabo_berezhkovskii_files/traj.png")
-vis.scatter_traj_projection_x(sim.traj, "harmonic_szabo_berezhkovskii_files/traj_x.png")
-vis.animate_traj(sim.traj, "harmonic_szabo_berezhkovskii_files/traj_movie", every=50)
-vis.animate_traj_projection_x(sim.traj, "harmonic_szabo_berezhkovskii_files/traj_movie", every=50)
+vis.scatter_traj(sim.traj, "harmonic_szabo_berezhkovskii_files/traj.png", every=50)
+vis.scatter_traj_projection_x(sim.traj, "harmonic_szabo_berezhkovskii_files/traj_x.png", every=50)
+vis.scatter_traj_projection_y(sim.traj, "harmonic_szabo_berezhkovskii_files/traj_y.png", every=50)
+vis.animate_traj(sim.traj, "harmonic_szabo_berezhkovskii_files/traj_movie", every=200)
+vis.animate_traj_projection_x(sim.traj, "harmonic_szabo_berezhkovskii_files/traj_movie", every=200)
+vis.animate_traj_projection_y(sim.traj, "harmonic_szabo_berezhkovskii_files/traj_movie", every=200)

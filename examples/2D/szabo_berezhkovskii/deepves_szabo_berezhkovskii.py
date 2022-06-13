@@ -34,7 +34,7 @@ plt.close()
 fig, ax, x, Fx = vis.plot_projection_x()
 plt.savefig("deepves_szabo_berezhkovskii_files/potential_x.png")
 
-fit_nn = False
+fit_nn = True
 if fit_nn:
     ################################################################################
     # Begin: Fit neural network to 1D projection
