@@ -27,7 +27,9 @@ class SingleParticleSimulation:
                  init_state: openmm.State = None,
                  init_coord: np.ndarray = np.array([0, 0, 0]).reshape((1, 3)),
                  gpu: bool = False,
-                 seed=None):
+                 cpu_threads: int = None,
+                 seed: int = None,
+                 traj_in_mem: bool = False):
         # Properties
         self.mass = mass * unit.dalton  # mass of particles
         self.temp = temp * unit.kelvin  # temperature
@@ -56,9 +58,10 @@ class SingleParticleSimulation:
             print("Running simulation on GPU.")
         else:
             platform = openmm.Platform.getPlatformByName('CPU')
-            num_threads = str(multiprocessing.cpu_count())
-            properties = {'Threads': num_threads}
-            print("Running simulation on {} CPU threads.".format(num_threads))
+            if cpu_threads is None:
+                cpu_threads = multiprocessing.cpu_count()
+            properties = {'Threads': str(cpu_threads)}
+            print("Running simulation on {} CPU threads.".format(cpu_threads))
 
         self.context = openmm.Context(self.system, self.integrator, platform, properties)
 
@@ -73,6 +76,7 @@ class SingleParticleSimulation:
             self.context.setState(init_state)
 
         # By default, the simulation is not biased
+        # If init_ves is called, this flag is set to True
         self.biased = False
 
     def init_ves(self,
@@ -166,43 +170,26 @@ class SingleParticleSimulation:
             ####################################################################
 
             # Checkpoint
-            if i % chkevery == 0:
-                self.dump_state(chkfile)
+            if i > 0 and i % chkevery == 0:
+                self._dump_state(chkfile, i)
 
             # Store positions
             if i % trajevery == 0:
-                pos = self.context.getState(getPositions=True).getPositions(asNumpy=True).value_in_unit(unit.nanometer)
-                if i == 0:
-                    self.traj = pos
-                else:
-                    self.traj = np.vstack((self.traj, pos))
+                self._write_trajectory(trajfile, i)
 
             # Store energy
             if i % energyevery == 0:
-                PE = self.context.getState(getEnergy=True).getPotentialEnergy() / unit.kilojoule_per_mole
-                self.PE.append(PE)
-                KE = self.context.getState(getEnergy=True).getKineticEnergy() / unit.kilojoule_per_mole
-                self.KE.append(KE)
+                self._write_energies(energyfile, i)
 
-            # Step
+            # Integrator step
             self.integrator.step(1)
 
         ####################################
-        # Final state
+        # Finalize
         ####################################
 
         # Checkpoint
-        self.dump_state(chkfile)
-
-        # Store positions
-        pos = self.context.getState(getPositions=True).getPositions(asNumpy=True).value_in_unit(unit.nanometer)
-        self.traj = np.vstack((self.traj, pos))
-
-        # Store energy
-        PE = self.context.getState(getEnergy=True).getPotentialEnergy() / unit.kilojoule_per_mole
-        self.PE.append(PE)
-        KE = self.context.getState(getEnergy=True).getKineticEnergy() / unit.kilojoule_per_mole
-        self.KE.append(KE)
+        self._dump_state(chkfile)
 
         ####################################
         # Write traj and energies
@@ -211,14 +198,42 @@ class SingleParticleSimulation:
         self.write_trajectory(trajfile)
         self.write_energies(energyfile)
 
-    def write_trajectory(self, ofilename):
-        np.savetxt(ofilename, self.traj, header='x [nm]    y [nm]    z [nm]')
+    def _dump_state(self, ofilename, i):
+        t = i * self.timestep / unit.picosecond
+        print("Checkpoint at {:10.7f} ps".format(t))
 
-    def write_energies(self, ofilename):
-        energy_array = np.vstack((np.array(self.PE), np.array(self.KE))).T
-        np.savetxt(ofilename, energy_array, header='PE [kJ/mol]    KE [kJ/mol]')
-
-    def dump_state(self, ofilename):
         state = self.context.getState(getPositions=True, getVelocities=True)
+
         with open(ofilename, "wb") as fh:
             pickle.dump(state, fh)
+
+    def _write_trajectory(self, ofilename, i):
+        t = i * self.timestep / unit.picosecond
+        pos = self.context.getState(getPositions=True).getPositions(asNumpy=True).value_in_unit(unit.nanometer)
+
+        # Store trajectory in memory
+        if self.traj_in_mem:
+            if i == 0:
+                self.traj = pos
+            else:
+                self.traj = np.vstack((self.traj, pos))
+
+        # Write trajectory to disk
+        if i == 0:
+            with open(ofilename, "w") as of:
+                of.write("# t[ps]    x [nm]    y [nm]    z[nm]\n")
+
+        with open(ofilename, "a") as of:
+            of.write("{:10.5f}\t{:10.7f}\t{:10.7f}\t{:10.7f}\n".format(t, pos[0, 0], pos[0, 1], pos[0, 2]))
+
+    def _write_energies(self, ofilename, i):
+        t = i * self.timestep / unit.picosecond
+        PE = self.context.getState(getEnergy=True).getPotentialEnergy() / unit.kilojoule_per_mole
+        KE = self.context.getState(getEnergy=True).getKineticEnergy() / unit.kilojoule_per_mole
+
+        if i == 0:
+            with open(ofilename, "w") as of:
+                of.write("# t[ps]    PE [kJ/mol]    KE [kJ/mol]\n")
+
+        with open(ofilename, "a") as of:
+            of.write("{:10.5f}\t{:10.7f}\t{:10.7f}\n".format(t, PE, KE))
