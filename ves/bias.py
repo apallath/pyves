@@ -28,13 +28,6 @@ class Bias:
         pass
 
 
-class LegendreBias_SingleParticle_x(Bias):
-    """
-    Applies a legendre potential bias along the x coordinate of a single particle.
-    """
-    pass
-
-
 ################################################################################
 # Neural network biases
 ################################################################################
@@ -101,13 +94,10 @@ class VESBias_SingleParticle_x(NNBias):
         Some basis sets (such as the Legendre basis set) can be slow to work with due to the large
         overhead associated with backpropagation for gradient computation.
     """
-    def __init__(self, V_module, x_min, x_max, target, beta, optimizer_type, optimizer_params, model_loc):
+    def __init__(self, V_module, target, beta, optimizer_type, optimizer_params,
+                 model_loc, update_steps=5000):
         # Bias potential V(x)
         self.model = V_module
-
-        # Scaling parameters
-        self.x_min = x_min
-        self.x_max = x_max
 
         # Target distribution p(x)
         self.target = target
@@ -124,6 +114,8 @@ class VESBias_SingleParticle_x(NNBias):
         else:
             raise ValueError("Requested optimizer not yet supported.")
 
+        self.update_steps = update_steps
+
         super().__init__(model_loc)
 
     def update(self, traj):
@@ -131,18 +123,15 @@ class VESBias_SingleParticle_x(NNBias):
         # Training loop with one optimizer step
         ########################################################################
 
-        # Scale traj
-        traj = traj / (self.x_max - self.x_min) + self.x_min
-
         # Zero gradients
         self.optimizer.zero_grad()
 
         # Evaluate biased part of loss
-        # Accumulate loss over entire trajectory
-        # TODO: Add support for different averaging methods
+        # Accumulate loss over last X steps
         eBV = torch.tensor([[0.0]], requires_grad=True)
         eBV_sum = eBV.clone()
-        for t in range(traj.shape[0]):
+        print(max(traj.shape[0] - self.update_steps, 0), traj.shape[0])
+        for t in range(max(traj.shape[0] - self.update_steps, 0), traj.shape[0]):
             xyz = torch.tensor(traj[t]).reshape((1, 3))
             eBV_sum += torch.exp(self.beta * self.model(xyz))
         loss_V = 1 / self.beta * torch.log(eBV_sum)

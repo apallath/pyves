@@ -6,7 +6,7 @@ import numpy as np
 import torch
 from tqdm import tqdm
 
-from ves.basis import NNBasis_x
+from ves.basis import NNBasis1D
 from ves.bias import VESBias_SingleParticle_x
 from ves.config_creation import singleParticle2D_init_coord
 from ves.langevin_dynamics import SingleParticleSimulation
@@ -22,19 +22,18 @@ if not os.path.exists("deepves_szabo_berezhkovskii_files/"):
 pot = SBPotential()
 temp = 300
 vis = VisualizePotential2D(pot, temp=temp,
-                           xrange=[-7.5, 7.5], yrange=[-7.5, 7.5],
+                           xrange=[-4, 4], yrange=[-4, 4],
                            contourvals=[-2, -1, 0, 1, 2, 5, 8, 10])
 
 # 2D surface
 fig, ax = vis.plot_potential()
 plt.savefig("deepves_szabo_berezhkovskii_files/potential.png")
-plt.close()
 
 # 1D projection
 fig, ax, x, Fx = vis.plot_projection_x()
 plt.savefig("deepves_szabo_berezhkovskii_files/potential_x.png")
 
-fit_nn = True
+fit_nn = False
 if fit_nn:
     ################################################################################
     # Begin: Fit neural network to 1D projection
@@ -42,41 +41,36 @@ if fit_nn:
     ################################################################################
     print("Fitting x-projection using NN model.")
 
-    # Standardize input
-    mu_x = np.mean(x)
-    sigma_x = np.std(x)
-    x_scale = (x - mu_x) / sigma_x
+    x_np = x[:]
+    # Min/max
+    min = x.min()
+    max = x.max()
 
-    # Standardize output
-    # No need to standardize output with ReLU activations => set mu and sigma to 0
-    mu_Fx = 0
-    sigma_Fx = 1
-    Fx_scale = (Fx - mu_Fx) / sigma_Fx
-
-    x_scale = torch.tensor(x_scale).reshape((len(x_scale), 1, 1))
-    Fx_scale = torch.tensor(Fx_scale).reshape((len(Fx_scale), 1, 1))
-    nn_fn = NNBasis_x()
+    x = torch.tensor(x).unsqueeze(-1).unsqueeze(-1)
+    Fx = torch.tensor(Fx).unsqueeze(-1)
+    nn_fn = NNBasis1D(min=min, max=max, hidden_layer_sizes=[128, 128])
     loss_fn = torch.nn.MSELoss()
-    optimizer = torch.optim.Adam(nn_fn.parameters(), lr=0.002)
+    optimizer = torch.optim.Adam(nn_fn.parameters(), lr=3e-4)
 
     losses = []
 
-    nnfitsteps = 5000
+    nnfitsteps = 10000
+    lossoutevery = 1000
 
     for step in tqdm(range(nnfitsteps)):
         optimizer.zero_grad()
-        output = nn_fn(x_scale)
-        # print(output.detach().numpy().shape)
-        # print(Fx.numpy()[:,:,0].shape)
-        loss = loss_fn(output, Fx_scale[:, :, 0])
+        output = nn_fn(x)
+        loss = loss_fn(output, Fx)
         losses.append(loss.detach().numpy())
-
         loss.backward()
         optimizer.step()
 
+        if step % lossoutevery == 0:
+            print("{:.4e}".format(loss.detach().numpy()))
+
     # 1D projection fit
-    fit_np = mu_Fx + sigma_Fx * nn_fn(x_scale).detach().numpy()
-    ax.plot(x, fit_np, label="NN fit")
+    fit_np = nn_fn(x).detach().numpy()
+    ax.plot(x_np, fit_np, label="NN fit")
     ax.legend()
     plt.savefig("deepves_szabo_berezhkovskii_files/potential_x_nnfit.png")
     plt.close()
@@ -91,11 +85,11 @@ if fit_nn:
     # End: Fit neural network to 1D projection
     ################################################################################
 
-run_sim = False
+run_sim = True
 if run_sim:
     # Monte carlo trials to place particle on potential energy surface
-    init_coord = singleParticle2D_init_coord(pot, 300, xmin=-7.5, xmax=7.5,
-                                             ymin=-7.5, ymax=7.5)
+    init_coord = singleParticle2D_init_coord(pot, 300, xmin=-4, xmax=4,
+                                             ymin=-4, ymax=4)
 
     # Initialize single particle simulation
     sim = SingleParticleSimulation(pot, init_coord=init_coord)
@@ -105,10 +99,9 @@ if run_sim:
     ################################################################################
     beta = 1 / (8.3145 / 1000 * temp)
     target = Target_Uniform_HardSwitch_x(200)
-    V_module = NNBasis_x()
+    V_module = NNBasis1D(min=-4, max=4, hidden_layer_sizes=[128, 128])
 
     ves_bias = VESBias_SingleParticle_x(V_module,
-                                        -7.5, 7.5,
                                         target,
                                         beta,
                                         optimizer_type="Adam",

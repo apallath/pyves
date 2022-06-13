@@ -29,7 +29,7 @@ class SingleParticleSimulation:
                  gpu: bool = False,
                  cpu_threads: int = None,
                  seed: int = None,
-                 traj_in_mem: bool = False):
+                 traj_in_mem: bool = True):
         # Properties
         self.mass = mass * unit.dalton  # mass of particles
         self.temp = temp * unit.kelvin  # temperature
@@ -74,6 +74,9 @@ class SingleParticleSimulation:
                 self.context.setVelocitiesToTemperature(self.temp)
         else:
             self.context.setState(init_state)
+
+        # Store traj in memory?
+        self.traj_in_mem = traj_in_mem
 
         # By default, the simulation is not biased
         # If init_ves is called, this flag is set to True
@@ -189,14 +192,7 @@ class SingleParticleSimulation:
         ####################################
 
         # Checkpoint
-        self._dump_state(chkfile)
-
-        ####################################
-        # Write traj and energies
-        ####################################
-
-        self.write_trajectory(trajfile)
-        self.write_energies(energyfile)
+        self._dump_state(chkfile, i)
 
     def _dump_state(self, ofilename, i):
         t = i * self.timestep / unit.picosecond
