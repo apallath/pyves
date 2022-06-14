@@ -21,7 +21,9 @@ class Bias:
         pass
 
     def update(self, traj):
-        pass
+        # Biases are static by default.
+        # Implementing the update method is optional.
+        raise NotImplementedError("This bias cannot be updated.")
 
     @property
     def force(self):
@@ -36,10 +38,17 @@ class Bias:
 class NNBias(Bias):
     """
     Abstract class defining neural network biases.
+
+    Child classes must set the self.model parameter to a TorchScript compatible
+    neural network instance before calling super().__init__().
     """
     def __init__(self, model_loc="model.pt"):
-        super().__init__()
         self.model_loc = model_loc
+
+        # self.model parameter needs to be set by the child class.
+        module = torch.jit.script(self.model)
+        module.save(self.model_loc)
+        super().__init__()
 
     @property
     def force(self):
@@ -52,9 +61,8 @@ class HarmonicBias_SingleParticle_x(NNBias):
     Applies a harmonic bias potential along the x coordinate of a single particle.
     """
     def __init__(self, k, x0, model_loc="model.pt"):
+        self.model = HarmonicBias_SingleParticle_x_ForceModule(k, x0)
         super().__init__(model_loc)
-        module = torch.jit.script(HarmonicBias_SingleParticle_x_ForceModule(k, x0))
-        module.save(self.model_loc)
 
 
 class HarmonicBias_SingleParticle_x_ForceModule(torch.nn.Module):
@@ -82,9 +90,29 @@ class HarmonicBias_SingleParticle_x_ForceModule(torch.nn.Module):
         return self.k / 2 * torch.sum((positions[:, 0] - self.x0) ** 2)
 
 
+class StaticBias_SingleParticle_x(NNBias):
+    """
+    Applies a **static** basis set expanded potential along the x coordinate of a single particle.
+
+    The potential (V_module) can either be:
+        a) an expansion over a basis set (Valsson and Parrinello 2014).
+        b) a neural network (Valsson and Parrinello 2014).
+
+    Note:
+        Some basis sets (such as the Legendre basis set) can be slow to work with due to the large
+        overhead associated with backpropagation for gradient computation.
+    """
+    def __init__(self, V_module, model_loc):
+        # Bias potential V(x)
+        self.model = V_module
+        super().__init__(model_loc)
+
+
 class VESBias_SingleParticle_x(NNBias):
     """
-    Applies a basis set expanded potential along the x coordinate of a single particle.
+    Applies a **dynamic** basis set expanded potential along the x coordinate of a single particle.
+    The parameters of the basis set can be updated by calling the `update` function with
+    a trajectory.
 
     The potential (V_module) can either be:
         a) an expansion over a basis set (Valsson and Parrinello 2014).

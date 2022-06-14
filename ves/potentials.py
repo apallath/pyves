@@ -145,16 +145,16 @@ class DoubleWellPotential2D(Potential2D):
     r"""
     Double well potential.
 
-    $$U(x, y) = x^4 - 4 x^2 + 0.7 x + 5 y^2$$
+    $$U(x, y) = 10(x^4 - 4 x^2 + 0.7 x) + 5 y^2$$
     """
     def __init__(self):
-        self.force = '''x^4 - 4 * x^2 + 0.7 * x + 5 * y^2'''
+        self.force = '''10 * (x^4 - 4 * x^2 + 0.7 * x) + 5 * y^2'''
 
         super().__init__()
 
     def potential(self, x, y):
         """Computes the double well potential at a given point (x, y)."""
-        return x ** 4 - 4 * x ** 2 + 0.7 * x + 5 * y ** 2
+        return 10 * (x ** 4 - 4 * x ** 2 + 0.7 * x) + 5 * y ** 2
 
 
 class SlipBondPotential2D(Potential2D):

@@ -3,7 +3,6 @@ Classes defining VES basis expansions for use with the neural network VES bias.
 """
 import torch
 import torch.nn as nn
-import torch.nn.functional as F
 
 
 torch.set_default_tensor_type(torch.DoubleTensor)
@@ -18,13 +17,18 @@ class LegendreBasis1D(torch.nn.Module):
         degree (int)
         axis (str): 'x' or 'y' (default='x')
     """
-    def __init__(self, degree, weights, min, max, axis='x'):
+    def __init__(self, degree, min, max, axis='x', weights=None):
         super().__init__()
         self.degree = degree
-        self.weights = torch.from_numpy(weights).type(torch.DoubleTensor)
         self.min = min
         self.max = max
         self.axis = axis
+
+        if weights is not None:
+            weights_tensor = torch.from_numpy(weights).type(torch.DoubleTensor)
+        else:
+            weights_tensor = torch.rand(degree).type(torch.DoubleTensor)
+        self.weights = nn.Parameter(weights_tensor)
 
     @classmethod
     def legendre_polynomial(cls, x, degree: int) -> torch.Tensor:
@@ -75,6 +79,7 @@ class LegendreBasis1D(torch.nn.Module):
 
         # Scale from [-1, 1]
         x = (x - (self.min + self.max) / 2) / ((self.max - self.min) / 2)
+        x = torch.clamp(x, min=-1, max=1)
 
         # Apply legendre expansion bias
         bias = torch.zeros_like(x)

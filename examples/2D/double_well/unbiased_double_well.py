@@ -12,10 +12,10 @@ if not os.path.exists("unbiased_double_well_files/"):
 
 # Create and visualize potential energy surface
 pot = DoubleWellPotential2D()
-temp = 0.5 / (8.314 / 1000)  # T ~ 0.5 / kB
+temp = 300
 vis = VisualizePotential2D(pot, temp=temp,
-                           xrange=[-3, 3], yrange=[-2, 2],
-                           clip=15, contourvals=11)
+                           xrange=[-2.5, 2.5], yrange=[-2, 2],
+                           contourvals=61)
 
 # 2D surface
 fig, ax = vis.plot_potential()
@@ -30,15 +30,15 @@ fig.savefig("unbiased_double_well_files/potential_y.png")
 plt.close('all')
 
 # Monte carlo trials to place particle on potential energy surface
-init_coord = singleParticle2D_init_coord(pot, temp, xmin=-2, xmax=2,
+init_coord = singleParticle2D_init_coord(pot, temp, xmin=-2.5, xmax=2.5,
                                          ymin=-2, ymax=2)
 
 # Perform single particle simulation
 sim = SingleParticleSimulation(pot, temp=temp, init_coord=init_coord)
 
 
-sim(nsteps=10000,
-    chkevery=2000,
+sim(nsteps=200000,
+    chkevery=10000,
     trajevery=1,
     energyevery=1,
     chkfile="unbiased_double_well_files/chk_state.dat",
@@ -49,6 +49,8 @@ sim(nsteps=10000,
 vis.scatter_traj(sim.traj, "unbiased_double_well_files/traj.png", every=50)
 vis.scatter_traj_projection_x(sim.traj, "unbiased_double_well_files/traj_x.png", every=50)
 vis.scatter_traj_projection_y(sim.traj, "unbiased_double_well_files/traj_y.png", every=50)
-vis.animate_traj(sim.traj, "unbiased_double_well_files/traj_movie", every=200)
-vis.animate_traj_projection_x(sim.traj, "unbiased_double_well_files/traj_movie", every=200)
-vis.animate_traj_projection_y(sim.traj, "unbiased_double_well_files/traj_movie", every=200)
+
+# Uncomment the following lines for animated trajectores:
+#vis.animate_traj(sim.traj, "unbiased_double_well_files/traj_movie", every=200)
+#vis.animate_traj_projection_x(sim.traj, "unbiased_double_well_files/traj_movie", every=200)
+#vis.animate_traj_projection_y(sim.traj, "unbiased_double_well_files/traj_movie", every=200)
