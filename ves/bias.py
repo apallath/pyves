@@ -9,13 +9,13 @@ import torch.optim as optim
 torch.set_default_tensor_type(torch.DoubleTensor)
 
 ################################################################################
-# Analytical biases
+# Base classes for biases
 ################################################################################
 
 
 class Bias:
     """
-    Abstract class defining biases that can be added to langevin dynamics simulations.
+    Base class defining biases.
     """
     def __init__(self):
         pass
@@ -30,17 +30,20 @@ class Bias:
         pass
 
 
-################################################################################
-# Neural network biases
-################################################################################
-
-
 class NNBias(Bias):
     """
-    Abstract class defining neural network biases.
+    Base class defining neural network biases.
 
     Child classes must set the self.model parameter to a TorchScript compatible
     neural network instance before calling super().__init__().
+
+    Warning:
+        Failing to set the self.model parameter will throw an exception.
+
+    Attributes:
+        model: TorchScript-compatible neural network instance which returns bias energy
+            from particle coordinates.
+        model_loc: Path to save module to.
     """
     def __init__(self, model_loc="model.pt"):
         self.model_loc = model_loc
@@ -55,25 +58,58 @@ class NNBias(Bias):
         torch_force = TorchForce(self.model_loc)
         return torch_force
 
+################################################################################
+# Analytical biases
+################################################################################
 
-class HarmonicBias_SingleParticle_x(NNBias):
+# TODO: Implement
+
+################################################################################
+# Neural network biases
+################################################################################
+
+# Static biases
+# -------------
+# These cannot be updated
+
+
+class HarmonicBias_SingleParticle_1D(NNBias):
     """
-    Applies a harmonic bias potential along the x coordinate of a single particle.
+    Applies a harmonic bias potential $k/2 (s - s0)^2$ along the x- or y- coordinate
+    of a single particle.
+
+    Attributes:
+        k (float): Strength of harmonic bias.
+        s0 (float): Location (x-/y- value) of harmonic bias' center.
+        axis (str): Axis (x/y) along which bias is applied.
+        model_loc: Path to save module to.
     """
-    def __init__(self, k, x0, model_loc="model.pt"):
-        self.model = HarmonicBias_SingleParticle_x_ForceModule(k, x0)
+    def __init__(self, k, s0, axis='x', model_loc="model.pt"):
+        if axis == 'x':
+            self.model = HarmonicBias_SingleParticle_1D_ForceModule(k, s0, axis='x')
+        elif axis == 'y':
+            self.model = HarmonicBias_SingleParticle_1D_ForceModule(k, s0, axis='y')
+        else:
+            raise ValueError("Invalid axis")
         super().__init__(model_loc)
 
 
-class HarmonicBias_SingleParticle_x_ForceModule(torch.nn.Module):
+class HarmonicBias_SingleParticle_1D_ForceModule(torch.nn.Module):
     """
-    A harmonic potential k/2 (x-x0)^2 as a static compute graph.
+    A harmonic potential $k/2 (s - s0)^2$ as a static compute graph.
 
-    The potential is only applied to the x-coordinate of the particle.
+    The `axis` attribute specifies whether the potential is applied to the x-
+    or the y- coordinate of the particle.
+
+    Attributes:
+        k (float): Strength of harmonic bias.
+        s0 (float): Location (x-/y- value) of harmonic bias' center.
+        axis (str): Axis (x/y) along which bias is applied.
     """
-    def __init__(self, k, x0):
+    def __init__(self, k, s0, axis='x'):
         self.k = k
-        self.x0 = x0
+        self.s0 = s0
+        self.axis = axis
         super().__init__()
 
     def forward(self, positions):
@@ -87,40 +123,61 @@ class HarmonicBias_SingleParticle_x_ForceModule(torch.nn.Module):
             potential : torch.Scalar
                 The potential energy (in kJ/mol)
         """
-        return self.k / 2 * torch.sum((positions[:, 0] - self.x0) ** 2)
+        # Extract coordinate
+        if self.axis == 'x':
+            s = positions[:, 0]
+        elif self.axis == 'y':
+            s = positions[:, 1]
+        else:
+            raise ValueError("Invalid axis")
+        return self.k / 2 * torch.sum((s - self.s0) ** 2)
 
 
-class StaticBias_SingleParticle_x(NNBias):
+class StaticBias_SingleParticle(NNBias):
     """
-    Applies a **static** basis set expanded potential along the x coordinate of a single particle.
+    Applies a **static** basis set expanded potential to a single particle.
 
-    The potential (V_module) can either be:
-        a) an expansion over a basis set (Valsson and Parrinello 2014).
-        b) a neural network (Valsson and Parrinello 2014).
+    The potential (V_module) can be an instance of:
+        a) ves.basis.LegendreBasis1D: an expansion over a basis set (Valsson and Parrinello 2014) along the x- or the y- coordinate.
+        b) ves.basis.LegendreString2D: an expansion over a basis set (Valsson and Parrinello 2014) along a string in the x- and y- coordinates.
+        c) ves.basis.NNBasis1D: a neural network (Valsson and Parrinello 2014) along the x- or the y- coordinate.
 
-    Note:
-        Some basis sets (such as the Legendre basis set) can be slow to work with due to the large
-        overhead associated with backpropagation for gradient computation.
+    Attributes:
+        V_module: TorchScript compatible neural network instance.
+        model_loc: Path to save module to.
     """
     def __init__(self, V_module, model_loc):
-        # Bias potential V(x)
+        # Bias potential V(x) or V(y)
         self.model = V_module
         super().__init__(model_loc)
 
 
-class VESBias_SingleParticle_x(NNBias):
+# Dynamic biases
+# --------------
+# These can be updated
+
+
+class VESBias_SingleParticle_1D(NNBias):
     """
-    Applies a **dynamic** basis set expanded potential along the x coordinate of a single particle.
+    Applies a **dynamic** basis set expanded potential along the x- or y- coordinate of a single particle.
     The parameters of the basis set can be updated by calling the `update` function with
     a trajectory.
 
-    The potential (V_module) can either be:
-        a) an expansion over a basis set (Valsson and Parrinello 2014).
-        b) a neural network (Valsson and Parrinello 2014).
+    The potential (V_module) can be an instance of:
+        a) ves.basis.LegendreBasis1D: an expansion over a basis set (Valsson and Parrinello 2014).
+        b) ves.basis.NNBasis1D: a neural network (Valsson and Parrinello 2014).
 
-    Note:
-        Some basis sets (such as the Legendre basis set) can be slow to work with due to the large
-        overhead associated with backpropagation for gradient computation.
+    The `axis` attribute of the V_module instance specifies whether the potential
+    acts along the x- or y- axis.
+
+    Attributes:
+        V_module:
+        target:
+        beta:
+        optimizer_type:
+        optimizer_params:
+        model_loc:
+        update_steps:
     """
     def __init__(self, V_module, target, beta, optimizer_type, optimizer_params,
                  model_loc, update_steps=5000):

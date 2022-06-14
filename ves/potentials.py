@@ -5,7 +5,7 @@ import numpy as np
 from openmm import openmm
 
 ################################################################################
-# 2D potentials
+# 1D potentials
 ################################################################################
 
 
@@ -295,10 +295,3 @@ class MullerBrownPotential(Potential2D):
             value += self.A[i] * np.exp(self.a[i] * (x - self.x_bar[i])**2 +
                                         self.b[i] * (x - self.x_bar[i]) * (y - self.y_bar[i]) + self.c[i] * (y - self.y_bar[i])**2)
         return value
-
-
-class WolfeQuappPotential(Potential2D):
-    """
-    2D Wolfe-Quapp potential
-    """
-    pass

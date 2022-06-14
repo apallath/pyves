@@ -10,35 +10,34 @@ from ves.bias import StaticBias_SingleParticle
 from ves.config_creation import singleParticle2D_init_coord
 from ves.langevin_dynamics import SingleParticleSimulation
 from ves.visualization import VisualizePotential2D
-from ves.potentials import DoubleWellPotential2D
+from ves.potentials import SlipBondPotential2D
 from ves.utils import TrajectoryReader
 
 
-if not os.path.exists("static_legendre_double_well_files/"):
-    os.makedirs("static_legendre_double_well_files/")
+if not os.path.exists("static_legendre_slip_bond_x_files/"):
+    os.makedirs("static_legendre_slip_bond_x_files/")
 
 # Create and visualize potential energy surface
-pot = DoubleWellPotential2D()
+pot = SlipBondPotential2D()
 temp = 300
 vis = VisualizePotential2D(pot, temp=temp,
-                           xrange=[-2.25, 2.25], yrange=[-2, 2],
-                           contourvals=11)
+                           xrange=[-8, 10], yrange=[-6, 8],
+                           contourvals=61)
 
 # 2D surface
 fig, ax = vis.plot_potential()
-fig.savefig("static_legendre_double_well_files/potential.png")
+fig.savefig("static_legendre_slip_bond_x_files/potential.png")
 
 # 1D projection along x
 fig, ax, x, Fx = vis.plot_projection_x()
-fig.savefig("static_legendre_double_well_files/potential_x.png")
+fig.savefig("static_legendre_slip_bond_x_files/potential_x.png")
 fig, ax, y, Fy = vis.plot_projection_y()
-fig.savefig("static_legendre_double_well_files/potential_y.png")
+fig.savefig("static_legendre_slip_bond_x_files/potential_y.png")
 
 ################################################################################
 # Begin: Fit legendre basis set expansion to 1D projection
-# This is to test the fitting capacity of the model
 ################################################################################
-fit_nn = True
+fit_nn = False
 if fit_nn:
     print("Fitting x-projection using legendre model.")
 
@@ -50,15 +49,15 @@ if fit_nn:
 
     x = torch.tensor(x).unsqueeze(-1)
     Fx = torch.tensor(Fx)
-    nn_fn = LegendreBasis1D(5, min=-2.5, max=2.5, weights=None)
+    nn_fn = LegendreBasis1D(12, min=-8, max=10, axis='x', weights=None)
 
     loss_fn = torch.nn.MSELoss()
     optimizer = torch.optim.Adam(nn_fn.parameters(), lr=1e-1)
 
     losses = []
 
-    nnfitsteps = 50000
-    lossoutevery = 5000
+    nnfitsteps = 10000
+    lossoutevery = 2000
 
     for step in tqdm(range(nnfitsteps)):
         optimizer.zero_grad()
@@ -83,14 +82,14 @@ if fit_nn:
     ax.set_xlabel("x")
     ax.set_ylabel("V(x)")
     ax.legend()
-    plt.savefig("static_legendre_double_well_files/potential_x_legendrefit.png")
+    plt.savefig("static_legendre_slip_bond_x_files/potential_x_legendrefit.png")
     plt.close()
 
     fig, ax = plt.subplots(dpi=300)
     ax.plot(range(len(losses)), losses)
     ax.set_xlabel("Iteration")
     ax.set_ylabel("MSE loss")
-    plt.savefig("static_legendre_double_well_files/legendrefit_loss_history.png")
+    plt.savefig("static_legendre_slip_bond_x_files/legendrefit_loss_history.png")
     plt.close()
 
     # Extract weights
@@ -101,26 +100,28 @@ if fit_nn:
     print(weights)
 
 ################################################################################
-# End: Fit neural network to 1D projection
+# End: Fit legendre basis set expansion to 1D projection
 ################################################################################
 
 ################################################################################
 # Begin: Simulation
 ################################################################################
-run_sim = True
+run_sim = False
 if run_sim:
     # Monte carlo trials to place particle on potential energy surface
-    init_coord = singleParticle2D_init_coord(pot, temp, xmin=-2.5, xmax=2.5,
-                                             ymin=-2, ymax=2)
+    init_coord = singleParticle2D_init_coord(pot, temp, xmin=-8, xmax=10,
+                                             ymin=-6, ymax=8)
 
     # Perform single particle simulation
-    sim = SingleParticleSimulation(pot, temp=temp, init_coord=init_coord)
+    sim = SingleParticleSimulation(pot, temp=temp, init_coord=init_coord, cpu_threads=1)
 
     # Begin: Initialize static bias
     if fit_nn is False:
-        weights = np.array([-4.48286631e+00, -1.74999996e+00, -5.65477074e+00, 7.26710048e-05, -8.92828224e+00])
-    V_module = LegendreBasis1D(5, min=-2.5, max=2.5, weights=weights)
-    ves_bias = StaticBias_SingleParticle(V_module, model_loc="static_legendre_double_well_files/model.pt")
+        weights = np.array([-2.77263647e+00, 1.42961587e-03, -2.58245794e+00, 1.42962134e-03,
+                            -5.90531562e+00, 1.42960738e-03, 2.88628829e+00, 1.42960217e-03,
+                            -1.76754607e+00, 1.42960140e-03, 1.08405009e+00, 1.42959931e-03])
+    V_module = LegendreBasis1D(12, min=-8, max=10, axis='x', weights=weights)
+    ves_bias = StaticBias_SingleParticle(V_module, model_loc="static_legendre_slip_bond_x_files/model.pt")
     sim.init_ves(ves_bias, static=True, startafter=500)
 
     # Call simulation
@@ -128,19 +129,19 @@ if run_sim:
         chkevery=10000,
         trajevery=1,
         energyevery=1,
-        chkfile="static_legendre_double_well_files/chk_state.dat",
-        trajfile="static_legendre_double_well_files/traj.dat",
-        energyfile="static_legendre_double_well_files/energies.dat")
+        chkfile="static_legendre_slip_bond_x_files/chk_state.dat",
+        trajfile="static_legendre_slip_bond_x_files/traj.dat",
+        energyfile="static_legendre_slip_bond_x_files/energies.dat")
 
     # Visualize trajectory
-    vis.scatter_traj(sim.traj, "static_legendre_double_well_files/traj.png", every=50)
-    vis.scatter_traj_projection_x(sim.traj, "static_legendre_double_well_files/traj_x.png", every=50)
-    vis.scatter_traj_projection_y(sim.traj, "static_legendre_double_well_files/traj_y.png", every=50)
+    vis.scatter_traj(sim.traj, "static_legendre_slip_bond_x_files/traj.png", every=50)
+    vis.scatter_traj_projection_x(sim.traj, "static_legendre_slip_bond_x_files/traj_x.png", every=50)
+    vis.scatter_traj_projection_y(sim.traj, "static_legendre_slip_bond_x_files/traj_y.png", every=50)
 
     # Uncomment the following lines for animated trajectores:
-    #vis.animate_traj(sim.traj, "static_legendre_double_well_files/traj_movie", every=200)
-    #vis.animate_traj_projection_x(sim.traj, "static_legendre_double_well_files/traj_movie", every=200)
-    #vis.animate_traj_projection_y(sim.traj, "static_legendre_double_well_files/traj_movie", every=200)
+    #vis.animate_traj(sim.traj, "static_legendre_slip_bond_x_files/traj_movie", every=200)
+    #vis.animate_traj_projection_x(sim.traj, "static_legendre_slip_bond_x_files/traj_movie", every=200)
+    #vis.animate_traj_projection_y(sim.traj, "static_legendre_slip_bond_x_files/traj_movie", every=200)
 
 ################################################################################
 # End: Simulation
@@ -149,10 +150,20 @@ if run_sim:
 ################################################################################
 # Begin: Plot timeseries
 ################################################################################
-t, traj = TrajectoryReader("static_legendre_double_well_files/traj.dat").read_traj()
+t, traj = TrajectoryReader("static_legendre_slip_bond_x_files/traj.dat").read_traj()
 
 fig, ax = plt.subplots(dpi=300)
 ax.plot(t, traj[:, 0])
 ax.set_xlabel("t")
 ax.set_ylabel("x")
-fig.savefig("static_legendre_double_well_files/ts_x.png")
+fig.savefig("static_legendre_slip_bond_x_files/ts_x.png")
+
+# Uncomment the following lines to re-plot trajectores:
+#vis.scatter_traj(traj, "static_legendre_slip_bond_x_files/traj.png", every=50)
+#vis.scatter_traj_projection_x(traj, "static_legendre_slip_bond_x_files/traj_x.png", every=50)
+#vis.scatter_traj_projection_y(traj, "static_legendre_slip_bond_x_files/traj_y.png", every=50)
+
+# Uncomment the following lines to re-animate trajectores:
+#vis.animate_traj(traj, "static_legendre_slip_bond_x_files/traj_movie", every=200)
+#vis.animate_traj_projection_x(traj, "static_legendre_slip_bond_x_files/traj_movie", every=200)
+#vis.animate_traj_projection_y(traj, "static_legendre_slip_bond_x_files/traj_movie", every=200)
