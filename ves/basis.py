@@ -1,5 +1,5 @@
 """
-Classes defining VES basis expansions for use with the neural network VES bias.
+Classes defining basis expansions.
 """
 import torch
 import torch.nn as nn
@@ -13,17 +13,34 @@ torch.set_default_tensor_type(torch.DoubleTensor)
 
 
 class LegendreBasis1D(torch.nn.Module):
-    """
-    Legendre polynomial basis expansion along x- or y- coordinate,
-    with user-defined degree.
+    r"""
+    Legendre polynomial basis expansion along x- or y- coordinate.
 
-    The coordinates s are scaled to lie within [-1, 1] using the
-    [min, max] attributes, as:
+    The coordinates x (or y) are scaled to lie within [-1, 1] using the
+    [min, max] attributes, as
 
-    $$s' = (s - (min + max) / 2) / ((max - min) / 2)$$
+    $$x' = (x - (min + max) / 2) / ((max - min) / 2)$$
+
+    A legendre basis expansion is defined over x', as
+
+    $$B(x') = \sum{i=0}^{d} w_i P_i(x')$$
+
+    where P_i is the legendre polynomial of order i, w_i is its coefficient in
+    the expansion, and d is the degree of the expansion.
+
+    Notes:
+        - Weights w_i are learnable as self.weights is a torch Parameter.
+        - This basis expansion can directly be used a TorchForce module.
 
     Attributes:
-        degree (int): Degree of basis.
+        degree (int): Degree of expansion.
+        min (float): Min x-/y-value for scaling.
+        max (float): Max x-/y-value for scaling.
+        axis (str): 'x' or 'y' (default='x').
+        weights (torch.nn.Parameter): Legendre polynomial coefficients (array len = degree).
+
+    Args:
+        degree (int): Degree of expansion.
         min (float): Min x-/y-value for scaling.
         max (float): Max x-/y-value for scaling.
         axis (str): 'x' or 'y' (default='x').
@@ -91,6 +108,7 @@ class LegendreBasis1D(torch.nn.Module):
 
         # Scale from [-1, 1]
         x = (x - (self.min + self.max) / 2) / ((self.max - self.min) / 2)
+
         # Clamp to prevent x from going outside Legendre polynomial domain
         # Also restricts enhanced sampling to within [min, max]
         x = torch.clamp(x, min=-1, max=1)
@@ -103,15 +121,31 @@ class LegendreBasis1D(torch.nn.Module):
 
 
 class NNBasis1D(nn.Module):
-    """
-    Neural network basis with a user-defined architecture.
+    r"""
+    Neural network basis expansion along x- or y- coordinate.
 
-    The coordinates s are scaled to lie within [-1, 1] using the
-    [min, max] attributes, as:
+    The coordinates x (or y) are scaled to lie within [0, 1] using the
+    [min, max] attributes, as
 
-    $$s' = (s - min) / (max - min)$$
+    $$x' = (x - min) / (max - min)$$
+
+    A nonlinear basis expansion is defined over x' as
+
+    $$B(x') = N(x')$$
+
+    where N is a neural network.
+
+    Notes:
+        - Neural network weights are learnable.
+        - This basis expansion can directly be used a TorchForce module.
 
     Attributes:
+        min (float): Min x-/y-value for scaling.
+        max (float): Max x-/y-value for scaling.
+        axis (str): 'x' or 'y' (default='x').
+        layers (torch.nn.ModuleList): List of neural layers.
+
+    Args:
         min (float): Min x-/y-value for scaling.
         max (float): Max x-/y-value for scaling.
         axis (str): 'x' or 'y' (default='x').
@@ -170,30 +204,48 @@ class NNBasis1D(nn.Module):
 
 
 ################################################################################
-# Basis expansions along strig connecting two points
+# Basis expansions along a 1-dimensional CV in 2D space
 ################################################################################
 
 
-class LegendreBasisString2D(torch.nn.Module):
-    """
-    Legendre polynomial basis expansion along 2D string,
-    with user-defined degree.
+class LegendreBasis2DRadialCV(torch.nn.Module):
+    r"""
+    Legendre polynomial basis expansion along a radial collective variable (CV) defined in the neighborhood
+    of points (x_min, y_min) and (x_max, y_max).
 
-    Any point (x, y) is first assigned a location on the string connecting
-    (x_min, y_min) and (x_max, y_max) as:
+    A point $(x, y)$ is mapped to a CV $s$ as
 
     $$s = ((x - x_min) ** 2 + (y - y_min) ** 2) / ((x_max - x_min) ** 2 + (y_max - y_min) ** 2)$$
 
-    and then scaled as:
+    and then scaled to lie within [-1, 1] as
 
     $$s' = (s - 1/2) / (1/2)$$
 
+    A legendre basis expansion is defined over s', as
+
+    $$B(s') = \sum{i=0}^{d} w_i P_i(s')$$
+
+    where P_i is the legendre polynomial of order i, w_i is its coefficient in
+    the expansion, and d is the degree of the expansion.
+
+    Notes:
+        - Weights w_i are learnable as self.weights is a torch Parameter.
+        - This basis expansion can directly be used a TorchForce module.
+
     Attributes:
         degree (int): Degree of basis.
-        x_min (float): Start x-coordinate of string.
-        y_min (float): Start y-coordiante of string.
-        x_max (float): End x-coordinate of string.
-        y_max (float): End y-coordiante of string.
+        x_min (float): Start x-coordinate.
+        y_min (float): Start y-coordinate.
+        x_max (float): End x-coordinate.
+        y_max (float): End y-coordinate.
+        weights (torch.nn.Parameter): Legendre polynomial coefficients (array len = degree).
+
+    Args:
+        degree (int): Degree of basis.
+        x_min (float): Start x-coordinate.
+        y_min (float): Start y-coordinate.
+        x_max (float): End x-coordinate.
+        y_max (float): End y-coordinate.
         weights (numpy.ndarray): Legendre polynomial coefficients (array len = degree).
     """
     def __init__(self, degree, x_min, y_min, x_max, y_max, weights=None):
@@ -267,3 +319,42 @@ class LegendreBasisString2D(torch.nn.Module):
         for i in range(self.degree):
             bias += self.weights[i] * self.legendre_polynomial(s, i)
         return bias
+
+
+class LegendreBasis2DPathCV(torch.nn.Module):
+    r"""
+    Legendre polynomial basis expansion along a path collective variable (CV) 
+    defined using the points $x_i, y_i$, which represent a path in 2D space.
+
+    For a point $(x, y)$ the CVs $s$ and $z$, which measure the location of
+    the point parallel to the path and perpendicular to the path respectively, 
+    are computed as
+
+    $$s = $$
+
+    $$z = $$
+
+    The CV $s$ is scaled to lie within [-1, 1] as
+
+    $$s' = (s - 1/2) / (1/2)$$
+
+    A legendre basis expansion is defined over s', as
+
+    $$B(s') = \sum{i=0}^{d} w_i P_i(s')$$
+
+    where P_i is the legendre polynomial of order i, w_i is its coefficient in
+    the expansion, and d is the degree of the expansion.
+
+    A harmonic bias is defined to restrict
+
+    This basis expansion can directly be used a TorchForce module.
+
+    Attributes:
+        degree (int): Degree of basis.
+        x_min (float): Start x-coordinate.
+        y_min (float): Start y-coordinate.
+        x_max (float): End x-coordinate.
+        y_max (float): End y-coordinate.
+        weights (numpy.ndarray): Legendre polynomial coefficients (array len = degree).
+    """
+    pass
