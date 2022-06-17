@@ -1,0 +1,1476 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ves package &mdash; pyves 0.0.1 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["\\(", "\\)"]], "displayMath": [["\\[", "\\]"]]}})</script>
+        <script>window.MathJax = {"tex": {"inlineMath": [["\\(", "\\)"]], "displayMath": [["\\[", "\\]"]]}}</script>
+        <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="prev" title="pyves" href="../index.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../index.html" class="icon icon-home"> pyves
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">ves package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-ves.basis">ves.basis module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-ves.bias">ves.bias module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-ves.config_creation">ves.config_creation module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-ves.langevin_dynamics">ves.langevin_dynamics module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-ves.potentials">ves.potentials module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-ves.target">ves.target module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-ves.utils">ves.utils module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-ves.visualization">ves.visualization module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-ves">Module contents</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">pyves</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>ves package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/ves/ves.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="ves-package">
+<h1>ves package<a class="headerlink" href="#ves-package" title="Permalink to this headline"></a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline"></a></h2>
+</section>
+<section id="module-ves.basis">
+<span id="ves-basis-module"></span><h2>ves.basis module<a class="headerlink" href="#module-ves.basis" title="Permalink to this headline"></a></h2>
+<p>Classes defining basis expansions.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="ves.basis.LegendreBasis1D">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ves.basis.</span></span><span class="sig-name descname"><span class="pre">LegendreBasis1D</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">degree</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">axis</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'x'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weights</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ves.basis.LegendreBasis1D" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">torch.nn.modules.module.Module</span></code></p>
+<p>Legendre polynomial basis expansion along x- or y- coordinate.</p>
+<p>The coordinates x (or y) are scaled to lie within [-1, 1] using the
+[min, max] attributes, as</p>
+<p><div class="math notranslate nohighlight">
+\[x' = \frac{x - (min + max) / 2}{(max - min) / 2}\]</div>
+</p>
+<p>A legendre basis expansion is defined over <span class="math notranslate nohighlight">\(x'\)</span>, as</p>
+<p><div class="math notranslate nohighlight">
+\[B(x') = \sum_{i=0}^{d} w_i P_i(x')\]</div>
+</p>
+<p>where <span class="math notranslate nohighlight">\(P_i\)</span> is the legendre polynomial of degree <span class="math notranslate nohighlight">\(i\)</span>, <span class="math notranslate nohighlight">\(w_i\)</span> is its coefficient in
+the expansion, and <span class="math notranslate nohighlight">\(d\)</span> is the degree of the expansion.</p>
+<p class="rubric">Notes</p>
+<ul class="simple">
+<li><p>Weights <span class="math notranslate nohighlight">\(w_i\)</span> are learnable as <cite>self.weights</cite> is a torch Parameter.</p></li>
+<li><p>This basis expansion can directly be used a TorchForce module.</p></li>
+</ul>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ves.basis.LegendreBasis1D.degree">
+<span class="sig-name descname"><span class="pre">degree</span></span><a class="headerlink" href="#ves.basis.LegendreBasis1D.degree" title="Permalink to this definition"></a></dt>
+<dd><p>Degree of expansion.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ves.basis.LegendreBasis1D.min">
+<span class="sig-name descname"><span class="pre">min</span></span><a class="headerlink" href="#ves.basis.LegendreBasis1D.min" title="Permalink to this definition"></a></dt>
+<dd><p>Min x-/y-value for scaling.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ves.basis.LegendreBasis1D.max">
+<span class="sig-name descname"><span class="pre">max</span></span><a class="headerlink" href="#ves.basis.LegendreBasis1D.max" title="Permalink to this definition"></a></dt>
+<dd><p>Max x-/y-value for scaling.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ves.basis.LegendreBasis1D.axis">
+<span class="sig-name descname"><span class="pre">axis</span></span><a class="headerlink" href="#ves.basis.LegendreBasis1D.axis" title="Permalink to this definition"></a></dt>
+<dd><p>‘x’ or ‘y’ (default=’x’).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ves.basis.LegendreBasis1D.weights">
+<span class="sig-name descname"><span class="pre">weights</span></span><a class="headerlink" href="#ves.basis.LegendreBasis1D.weights" title="Permalink to this definition"></a></dt>
+<dd><p>Legendre polynomial coefficients (array len = degree).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>torch.nn.Parameter</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>degree</strong> (<em>int</em>) – Degree of expansion.</p></li>
+<li><p><strong>min</strong> (<em>float</em>) – Min x-/y-value for scaling.</p></li>
+<li><p><strong>max</strong> (<em>float</em>) – Max x-/y-value for scaling.</p></li>
+<li><p><strong>axis</strong> (<em>str</em>) – ‘x’ or ‘y’ (default=’x’).</p></li>
+<li><p><strong>weights</strong> (<em>numpy.ndarray</em>) – Legendre polynomial coefficients (array len = degree).</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="ves.basis.LegendreBasis1D.forward">
+<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">positions</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ves.basis.LegendreBasis1D.forward" title="Permalink to this definition"></a></dt>
+<dd><p>The forward method returns the energy computed from positions.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>positions</strong> – torch.Tensor with shape (1, 3)
+positions[0, k] is the position (in nanometers) of spatial dimension k of particle 0</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>torch.Scalar</dt><dd><p>The potential energy (in kJ/mol)</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>potential</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ves.basis.LegendreBasis1D.legendre_polynomial">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">legendre_polynomial</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">degree</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">torch.Tensor</span></span></span><a class="headerlink" href="#ves.basis.LegendreBasis1D.legendre_polynomial" title="Permalink to this definition"></a></dt>
+<dd><p>Computes a legendre polynomial of degree <span class="math notranslate nohighlight">\(n\)</span> using dynamic programming
+and the Bonnet’s recursion formula:</p>
+<p><div class="math notranslate nohighlight">
+\[(n + 1) P_{n+1}(x) = (2n + 1) x P_n(x) - nP_{n-1}(x)\]</div>
+</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ves.basis.LegendreBasis1D.training">
+<span class="sig-name descname"><span class="pre">training</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#ves.basis.LegendreBasis1D.training" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="ves.basis.LegendreBasis2DPathCV">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ves.basis.</span></span><span class="sig-name descname"><span class="pre">LegendreBasis2DPathCV</span></span><a class="headerlink" href="#ves.basis.LegendreBasis2DPathCV" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">torch.nn.modules.module.Module</span></code></p>
+<p>Legendre polynomial basis expansion along a path collective variable (CV)
+defined using the points <span class="math notranslate nohighlight">\(x_i, y_i\)</span>, which represent a path in 2D space.</p>
+<p>For a point <span class="math notranslate nohighlight">\((x, y)\)</span> the CVs <span class="math notranslate nohighlight">\(s\)</span> and <span class="math notranslate nohighlight">\(z\)</span>, which measure the location of
+the point parallel to the path and perpendicular to the path respectively,
+are computed as</p>
+<p><div class="math notranslate nohighlight">
+\[s = \sum_{i=1}^{N} \frac{\gamma_i \exp(-\lambda \sqrt{(x - x_i) ^ 2 + (y - y_i) ^ 2})}{\exp(-\lambda \sqrt{(x - x_i) ^ 2 + (y - y_i) ^ 2})}\]</div>
+</p>
+<p><div class="math notranslate nohighlight">
+\[z = -\frac{1}{\lambda} \ln (\exp(-\lambda \sqrt{(x - x_i) ^ 2 + (y - y_i) ^ 2}))\]</div>
+</p>
+<p>where <span class="math notranslate nohighlight">\(\gamma_i\)</span> is a parameter that varies from 0 to 1 along the path from <span class="math notranslate nohighlight">\(i=1\)</span> to <span class="math notranslate nohighlight">\(N\)</span>.</p>
+<p>The CV <span class="math notranslate nohighlight">\(s\)</span> is scaled to lie within [-1, 1] as</p>
+<p><div class="math notranslate nohighlight">
+\[s' = (s - 1/2) / (1/2)\]</div>
+</p>
+<p>A legendre basis expansion is defined over <span class="math notranslate nohighlight">\(s'\)</span>, as</p>
+<p><div class="math notranslate nohighlight">
+\[B(s') = \sum_{i=0}^{d} w_i P_i(s')\]</div>
+</p>
+<p>where <span class="math notranslate nohighlight">\(P_i\)</span> is the legendre polynomial of order <span class="math notranslate nohighlight">\(i\)</span>, <span class="math notranslate nohighlight">\(w_i\)</span> is its coefficient in
+the expansion, and <span class="math notranslate nohighlight">\(d\)</span> is the degree of the expansion.</p>
+<p>A harmonic bias is defined to guide sampling towards regions near the path, as</p>
+<p><div class="math notranslate nohighlight">
+\[U(z) = \frac{\kappa}{2} z^2\]</div>
+</p>
+<p>This basis expansion can directly be used a TorchForce module.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ves.basis.LegendreBasis2DPathCV.degree">
+<span class="sig-name descname"><span class="pre">degree</span></span><a class="headerlink" href="#ves.basis.LegendreBasis2DPathCV.degree" title="Permalink to this definition"></a></dt>
+<dd><p>Degree of basis.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ves.basis.LegendreBasis2DPathCV.x_min">
+<span class="sig-name descname"><span class="pre">x_min</span></span><a class="headerlink" href="#ves.basis.LegendreBasis2DPathCV.x_min" title="Permalink to this definition"></a></dt>
+<dd><p>Start x-coordinate.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ves.basis.LegendreBasis2DPathCV.y_min">
+<span class="sig-name descname"><span class="pre">y_min</span></span><a class="headerlink" href="#ves.basis.LegendreBasis2DPathCV.y_min" title="Permalink to this definition"></a></dt>
+<dd><p>Start y-coordinate.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ves.basis.LegendreBasis2DPathCV.x_max">
+<span class="sig-name descname"><span class="pre">x_max</span></span><a class="headerlink" href="#ves.basis.LegendreBasis2DPathCV.x_max" title="Permalink to this definition"></a></dt>
+<dd><p>End x-coordinate.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ves.basis.LegendreBasis2DPathCV.y_max">
+<span class="sig-name descname"><span class="pre">y_max</span></span><a class="headerlink" href="#ves.basis.LegendreBasis2DPathCV.y_max" title="Permalink to this definition"></a></dt>
+<dd><p>End y-coordinate.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ves.basis.LegendreBasis2DPathCV.weights">
+<span class="sig-name descname"><span class="pre">weights</span></span><a class="headerlink" href="#ves.basis.LegendreBasis2DPathCV.weights" title="Permalink to this definition"></a></dt>
+<dd><p>Legendre polynomial coefficients (array len = degree).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>numpy.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ves.basis.LegendreBasis2DPathCV.training">
+<span class="sig-name descname"><span class="pre">training</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#ves.basis.LegendreBasis2DPathCV.training" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="ves.basis.LegendreBasis2DRadialCV">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ves.basis.</span></span><span class="sig-name descname"><span class="pre">LegendreBasis2DRadialCV</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">degree</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_min</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_min</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_max</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_max</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weights</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ves.basis.LegendreBasis2DRadialCV" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">torch.nn.modules.module.Module</span></code></p>
+<p>Legendre polynomial basis expansion along a radial collective variable (CV) defined in the neighborhood
+of points <span class="math notranslate nohighlight">\((x_min, y_min)\)</span> and <span class="math notranslate nohighlight">\((x_max, y_max)\)</span>.</p>
+<p>A point <span class="math notranslate nohighlight">\((x, y)\)</span> is mapped to a CV <span class="math notranslate nohighlight">\(s\)</span> as</p>
+<p><div class="math notranslate nohighlight">
+\[s = \frac{(x - x_{min})^2 + (y - y_{min})^2}{(x_{max} - x_{min})^2 + (y_{max} - y_{min})^2}\]</div>
+</p>
+<p>and then scaled to lie within [-1, 1] as</p>
+<p><div class="math notranslate nohighlight">
+\[s' = (s - 1/2) / (1/2)\]</div>
+</p>
+<p>A legendre basis expansion is defined over <span class="math notranslate nohighlight">\(s'\)</span>, as</p>
+<p><div class="math notranslate nohighlight">
+\[B(s') = \sum_{i=0}^{d} w_i P_i(s')\]</div>
+</p>
+<p>where <span class="math notranslate nohighlight">\(P_i\)</span> is the legendre polynomial of order <span class="math notranslate nohighlight">\(i\)</span>, <span class="math notranslate nohighlight">\(w_i\)</span> is its coefficient in
+the expansion, and <span class="math notranslate nohighlight">\(d\)</span> is the degree of the expansion.</p>
+<p class="rubric">Notes</p>
+<ul class="simple">
+<li><p>Weights <span class="math notranslate nohighlight">\(w_i\)</span> are learnable as <cite>self.weights</cite> is a torch Parameter.</p></li>
+<li><p>This basis expansion can directly be used a TorchForce module.</p></li>
+</ul>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ves.basis.LegendreBasis2DRadialCV.degree">
+<span class="sig-name descname"><span class="pre">degree</span></span><a class="headerlink" href="#ves.basis.LegendreBasis2DRadialCV.degree" title="Permalink to this definition"></a></dt>
+<dd><p>Degree of basis.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ves.basis.LegendreBasis2DRadialCV.x_min">
+<span class="sig-name descname"><span class="pre">x_min</span></span><a class="headerlink" href="#ves.basis.LegendreBasis2DRadialCV.x_min" title="Permalink to this definition"></a></dt>
+<dd><p>Start x-coordinate.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ves.basis.LegendreBasis2DRadialCV.y_min">
+<span class="sig-name descname"><span class="pre">y_min</span></span><a class="headerlink" href="#ves.basis.LegendreBasis2DRadialCV.y_min" title="Permalink to this definition"></a></dt>
+<dd><p>Start y-coordinate.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ves.basis.LegendreBasis2DRadialCV.x_max">
+<span class="sig-name descname"><span class="pre">x_max</span></span><a class="headerlink" href="#ves.basis.LegendreBasis2DRadialCV.x_max" title="Permalink to this definition"></a></dt>
+<dd><p>End x-coordinate.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ves.basis.LegendreBasis2DRadialCV.y_max">
+<span class="sig-name descname"><span class="pre">y_max</span></span><a class="headerlink" href="#ves.basis.LegendreBasis2DRadialCV.y_max" title="Permalink to this definition"></a></dt>
+<dd><p>End y-coordinate.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ves.basis.LegendreBasis2DRadialCV.weights">
+<span class="sig-name descname"><span class="pre">weights</span></span><a class="headerlink" href="#ves.basis.LegendreBasis2DRadialCV.weights" title="Permalink to this definition"></a></dt>
+<dd><p>Legendre polynomial coefficients (array len = degree).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>torch.nn.Parameter</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>degree</strong> (<em>int</em>) – Degree of basis.</p></li>
+<li><p><strong>x_min</strong> (<em>float</em>) – Start x-coordinate.</p></li>
+<li><p><strong>y_min</strong> (<em>float</em>) – Start y-coordinate.</p></li>
+<li><p><strong>x_max</strong> (<em>float</em>) – End x-coordinate.</p></li>
+<li><p><strong>y_max</strong> (<em>float</em>) – End y-coordinate.</p></li>
+<li><p><strong>weights</strong> (<em>numpy.ndarray</em>) – Legendre polynomial coefficients (array len = degree).</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="ves.basis.LegendreBasis2DRadialCV.forward">
+<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">positions</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ves.basis.LegendreBasis2DRadialCV.forward" title="Permalink to this definition"></a></dt>
+<dd><p>The forward method returns the energy computed from positions.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>positions</strong> – torch.Tensor with shape (1, 3)
+positions[0, k] is the position (in nanometers) of spatial dimension k of particle 0</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>torch.Scalar</dt><dd><p>The potential energy (in kJ/mol)</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>potential</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ves.basis.LegendreBasis2DRadialCV.legendre_polynomial">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">legendre_polynomial</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">degree</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">torch.Tensor</span></span></span><a class="headerlink" href="#ves.basis.LegendreBasis2DRadialCV.legendre_polynomial" title="Permalink to this definition"></a></dt>
+<dd><p>Computes a legendre polynomial of degree <span class="math notranslate nohighlight">\(n\)</span> using dynamic programming
+and the Bonnet’s recursion formula:</p>
+<p><div class="math notranslate nohighlight">
+\[(n + 1) P_{n+1}(x) = (2n + 1) x P_n(x) - nP_{n-1}(x)\]</div>
+</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ves.basis.LegendreBasis2DRadialCV.training">
+<span class="sig-name descname"><span class="pre">training</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#ves.basis.LegendreBasis2DRadialCV.training" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="ves.basis.NNBasis1D">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ves.basis.</span></span><span class="sig-name descname"><span class="pre">NNBasis1D</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">min</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">axis='x'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hidden_layer_sizes=[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">act=&lt;class</span> <span class="pre">'torch.nn.modules.activation.ReLU'&gt;</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ves.basis.NNBasis1D" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">torch.nn.modules.module.Module</span></code></p>
+<p>Neural network basis expansion along x- or y- coordinate.</p>
+<p>The coordinates x (or y) are scaled to lie within [0, 1] using the
+[min, max] attributes, as</p>
+<p><div class="math notranslate nohighlight">
+\[x' = (x - min) / (max - min)\]</div>
+</p>
+<p>A nonlinear basis expansion is defined over <span class="math notranslate nohighlight">\(x'\)</span> as</p>
+<p><div class="math notranslate nohighlight">
+\[B(x') = N(x')\]</div>
+</p>
+<p>where <span class="math notranslate nohighlight">\(N\)</span> is a neural network.</p>
+<p class="rubric">Notes</p>
+<ul class="simple">
+<li><p>Neural network weights are learnable.</p></li>
+<li><p>This basis expansion can directly be used a TorchForce module.</p></li>
+</ul>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ves.basis.NNBasis1D.min">
+<span class="sig-name descname"><span class="pre">min</span></span><a class="headerlink" href="#ves.basis.NNBasis1D.min" title="Permalink to this definition"></a></dt>
+<dd><p>Min x-/y-value for scaling.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ves.basis.NNBasis1D.max">
+<span class="sig-name descname"><span class="pre">max</span></span><a class="headerlink" href="#ves.basis.NNBasis1D.max" title="Permalink to this definition"></a></dt>
+<dd><p>Max x-/y-value for scaling.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ves.basis.NNBasis1D.axis">
+<span class="sig-name descname"><span class="pre">axis</span></span><a class="headerlink" href="#ves.basis.NNBasis1D.axis" title="Permalink to this definition"></a></dt>
+<dd><p>‘x’ or ‘y’ (default=’x’).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ves.basis.NNBasis1D.layers">
+<span class="sig-name descname"><span class="pre">layers</span></span><a class="headerlink" href="#ves.basis.NNBasis1D.layers" title="Permalink to this definition"></a></dt>
+<dd><p>List of neural layers.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>torch.nn.ModuleList</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>min</strong> (<em>float</em>) – Min x-/y-value for scaling.</p></li>
+<li><p><strong>max</strong> (<em>float</em>) – Max x-/y-value for scaling.</p></li>
+<li><p><strong>axis</strong> (<em>str</em>) – ‘x’ or ‘y’ (default=’x’).</p></li>
+<li><p><strong>hidden_layer_sizes</strong> (<em>list</em>) – List of neural network hidden layer sizes.</p></li>
+<li><p><strong>act</strong> (<em>torch.nn.Module</em>) – Activation (default=torch.nn.ReLU).</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="ves.basis.NNBasis1D.forward">
+<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">positions</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ves.basis.NNBasis1D.forward" title="Permalink to this definition"></a></dt>
+<dd><p>The forward method returns the energy computed from positions.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>positions</strong> – torch.Tensor with shape (1, 3)
+positions[0, k] is the position (in nanometers) of spatial dimension k of particle 0</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>torch.Scalar</dt><dd><p>The potential energy (in kJ/mol)</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>potential</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ves.basis.NNBasis1D.training">
+<span class="sig-name descname"><span class="pre">training</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#ves.basis.NNBasis1D.training" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-ves.bias">
+<span id="ves-bias-module"></span><h2>ves.bias module<a class="headerlink" href="#module-ves.bias" title="Permalink to this headline"></a></h2>
+<p>Classes defining bias potentials and update mechanisms.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="ves.bias.Bias">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ves.bias.</span></span><span class="sig-name descname"><span class="pre">Bias</span></span><a class="headerlink" href="#ves.bias.Bias" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Base class defining biases.</p>
+<dl class="py property">
+<dt class="sig sig-object py" id="ves.bias.Bias.force">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">force</span></span><a class="headerlink" href="#ves.bias.Bias.force" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ves.bias.Bias.update">
+<span class="sig-name descname"><span class="pre">update</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">traj</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ves.bias.Bias.update" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="ves.bias.HarmonicBias_SingleParticle_1D">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ves.bias.</span></span><span class="sig-name descname"><span class="pre">HarmonicBias_SingleParticle_1D</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">k</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">s0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">axis</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'x'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_loc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'model.pt'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ves.bias.HarmonicBias_SingleParticle_1D" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#ves.bias.NNBias" title="ves.bias.NNBias"><code class="xref py py-class docutils literal notranslate"><span class="pre">ves.bias.NNBias</span></code></a></p>
+<p>Applies a harmonic bias potential <span class="math notranslate nohighlight">\(k/2 (s - s0)^2\)</span> along the x- or y- coordinate
+of a single particle.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ves.bias.HarmonicBias_SingleParticle_1D.k">
+<span class="sig-name descname"><span class="pre">k</span></span><a class="headerlink" href="#ves.bias.HarmonicBias_SingleParticle_1D.k" title="Permalink to this definition"></a></dt>
+<dd><p>Strength of harmonic bias.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ves.bias.HarmonicBias_SingleParticle_1D.s0">
+<span class="sig-name descname"><span class="pre">s0</span></span><a class="headerlink" href="#ves.bias.HarmonicBias_SingleParticle_1D.s0" title="Permalink to this definition"></a></dt>
+<dd><p>Location (x-/y- value) of harmonic bias’ center.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ves.bias.HarmonicBias_SingleParticle_1D.axis">
+<span class="sig-name descname"><span class="pre">axis</span></span><a class="headerlink" href="#ves.bias.HarmonicBias_SingleParticle_1D.axis" title="Permalink to this definition"></a></dt>
+<dd><p>Axis (x/y) along which bias is applied.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ves.bias.HarmonicBias_SingleParticle_1D.model_loc">
+<span class="sig-name descname"><span class="pre">model_loc</span></span><a class="headerlink" href="#ves.bias.HarmonicBias_SingleParticle_1D.model_loc" title="Permalink to this definition"></a></dt>
+<dd><p>Path to save module to.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="ves.bias.HarmonicBias_SingleParticle_1D_ForceModule">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ves.bias.</span></span><span class="sig-name descname"><span class="pre">HarmonicBias_SingleParticle_1D_ForceModule</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">k</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">s0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">axis</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'x'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ves.bias.HarmonicBias_SingleParticle_1D_ForceModule" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">torch.nn.modules.module.Module</span></code></p>
+<p>A harmonic potential <span class="math notranslate nohighlight">\(k/2 (s - s0)^2\)</span> as a static compute graph.</p>
+<p>The <cite>axis</cite> attribute specifies whether the potential is applied to the x-
+or the y- coordinate of the particle.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ves.bias.HarmonicBias_SingleParticle_1D_ForceModule.k">
+<span class="sig-name descname"><span class="pre">k</span></span><a class="headerlink" href="#ves.bias.HarmonicBias_SingleParticle_1D_ForceModule.k" title="Permalink to this definition"></a></dt>
+<dd><p>Strength of harmonic bias.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ves.bias.HarmonicBias_SingleParticle_1D_ForceModule.s0">
+<span class="sig-name descname"><span class="pre">s0</span></span><a class="headerlink" href="#ves.bias.HarmonicBias_SingleParticle_1D_ForceModule.s0" title="Permalink to this definition"></a></dt>
+<dd><p>Location (x-/y- value) of harmonic bias’ center.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ves.bias.HarmonicBias_SingleParticle_1D_ForceModule.axis">
+<span class="sig-name descname"><span class="pre">axis</span></span><a class="headerlink" href="#ves.bias.HarmonicBias_SingleParticle_1D_ForceModule.axis" title="Permalink to this definition"></a></dt>
+<dd><p>Axis (x/y) along which bias is applied.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ves.bias.HarmonicBias_SingleParticle_1D_ForceModule.forward">
+<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">positions</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ves.bias.HarmonicBias_SingleParticle_1D_ForceModule.forward" title="Permalink to this definition"></a></dt>
+<dd><p>The forward method returns the energy computed from positions.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>positions</strong> – torch.Tensor with shape (1, 3)
+positions[0, k] is the position (in nanometers) of spatial dimension k of particle 0</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>torch.Scalar</dt><dd><p>The potential energy (in kJ/mol)</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>potential</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ves.bias.HarmonicBias_SingleParticle_1D_ForceModule.training">
+<span class="sig-name descname"><span class="pre">training</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#ves.bias.HarmonicBias_SingleParticle_1D_ForceModule.training" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="ves.bias.NNBias">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ves.bias.</span></span><span class="sig-name descname"><span class="pre">NNBias</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model_loc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'model.pt'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ves.bias.NNBias" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#ves.bias.Bias" title="ves.bias.Bias"><code class="xref py py-class docutils literal notranslate"><span class="pre">ves.bias.Bias</span></code></a></p>
+<p>Base class defining neural network biases.</p>
+<p>Child classes must set the self.model parameter to a TorchScript compatible
+neural network instance before calling super().__init__().</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Failing to set the self.model parameter will throw an exception.</p>
+</div>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ves.bias.NNBias.model">
+<span class="sig-name descname"><span class="pre">model</span></span><a class="headerlink" href="#ves.bias.NNBias.model" title="Permalink to this definition"></a></dt>
+<dd><p>TorchScript-compatible neural network instance which returns bias energy
+from particle coordinates.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ves.bias.NNBias.model_loc">
+<span class="sig-name descname"><span class="pre">model_loc</span></span><a class="headerlink" href="#ves.bias.NNBias.model_loc" title="Permalink to this definition"></a></dt>
+<dd><p>Path to save module to.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="ves.bias.NNBias.force">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">force</span></span><a class="headerlink" href="#ves.bias.NNBias.force" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="ves.bias.StaticBias_SingleParticle">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ves.bias.</span></span><span class="sig-name descname"><span class="pre">StaticBias_SingleParticle</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">V_module</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_loc</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ves.bias.StaticBias_SingleParticle" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#ves.bias.NNBias" title="ves.bias.NNBias"><code class="xref py py-class docutils literal notranslate"><span class="pre">ves.bias.NNBias</span></code></a></p>
+<p>Applies a <strong>static</strong> basis set expanded potential to a single particle.</p>
+<dl class="simple">
+<dt>The potential (V_module) can be an instance of:</dt><dd><ol class="loweralpha simple">
+<li><p>ves.basis.LegendreBasis1D: an expansion over a basis set (Valsson and Parrinello 2014) along the x- or the y- coordinate.</p></li>
+<li><p>ves.basis.LegendreString2D: an expansion over a basis set (Valsson and Parrinello 2014) along a string in the x- and y- coordinates.</p></li>
+<li><p>ves.basis.NNBasis1D: a neural network (Valsson and Parrinello 2014) along the x- or the y- coordinate.</p></li>
+</ol>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ves.bias.StaticBias_SingleParticle.V_module">
+<span class="sig-name descname"><span class="pre">V_module</span></span><a class="headerlink" href="#ves.bias.StaticBias_SingleParticle.V_module" title="Permalink to this definition"></a></dt>
+<dd><p>TorchScript compatible neural network instance.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ves.bias.StaticBias_SingleParticle.model_loc">
+<span class="sig-name descname"><span class="pre">model_loc</span></span><a class="headerlink" href="#ves.bias.StaticBias_SingleParticle.model_loc" title="Permalink to this definition"></a></dt>
+<dd><p>Path to save module to.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="ves.bias.VESBias_SingleParticle_1D">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ves.bias.</span></span><span class="sig-name descname"><span class="pre">VESBias_SingleParticle_1D</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">V_module</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">beta</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optimizer_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optimizer_params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_loc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">update_steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5000</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ves.bias.VESBias_SingleParticle_1D" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#ves.bias.NNBias" title="ves.bias.NNBias"><code class="xref py py-class docutils literal notranslate"><span class="pre">ves.bias.NNBias</span></code></a></p>
+<p>Applies a <strong>dynamic</strong> basis set expanded potential along the x- or y- coordinate of a single particle.
+The parameters of the basis set can be updated by calling the <cite>update</cite> function with
+a trajectory.</p>
+<dl class="simple">
+<dt>The potential (V_module) can be an instance of:</dt><dd><ol class="loweralpha simple">
+<li><p>ves.basis.LegendreBasis1D: an expansion over a basis set (Valsson and Parrinello 2014).</p></li>
+<li><p>ves.basis.NNBasis1D: a neural network (Valsson and Parrinello 2014).</p></li>
+</ol>
+</dd>
+</dl>
+<p>The <cite>axis</cite> attribute of the V_module instance specifies whether the potential
+acts along the x- or y- axis.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ves.bias.VESBias_SingleParticle_1D.V_module">
+<span class="sig-name descname"><span class="pre">V_module</span></span><a class="headerlink" href="#ves.bias.VESBias_SingleParticle_1D.V_module" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ves.bias.VESBias_SingleParticle_1D.target">
+<span class="sig-name descname"><span class="pre">target</span></span><a class="headerlink" href="#ves.bias.VESBias_SingleParticle_1D.target" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ves.bias.VESBias_SingleParticle_1D.beta">
+<span class="sig-name descname"><span class="pre">beta</span></span><a class="headerlink" href="#ves.bias.VESBias_SingleParticle_1D.beta" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ves.bias.VESBias_SingleParticle_1D.optimizer_type">
+<span class="sig-name descname"><span class="pre">optimizer_type</span></span><a class="headerlink" href="#ves.bias.VESBias_SingleParticle_1D.optimizer_type" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ves.bias.VESBias_SingleParticle_1D.optimizer_params">
+<span class="sig-name descname"><span class="pre">optimizer_params</span></span><a class="headerlink" href="#ves.bias.VESBias_SingleParticle_1D.optimizer_params" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ves.bias.VESBias_SingleParticle_1D.model_loc">
+<span class="sig-name descname"><span class="pre">model_loc</span></span><a class="headerlink" href="#ves.bias.VESBias_SingleParticle_1D.model_loc" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ves.bias.VESBias_SingleParticle_1D.update_steps">
+<span class="sig-name descname"><span class="pre">update_steps</span></span><a class="headerlink" href="#ves.bias.VESBias_SingleParticle_1D.update_steps" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ves.bias.VESBias_SingleParticle_1D.update">
+<span class="sig-name descname"><span class="pre">update</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">traj</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ves.bias.VESBias_SingleParticle_1D.update" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-ves.config_creation">
+<span id="ves-config-creation-module"></span><h2>ves.config_creation module<a class="headerlink" href="#module-ves.config_creation" title="Permalink to this headline"></a></h2>
+<p>Functions to help create initial configurations.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="ves.config_creation.singleParticle1D_init_coord">
+<span class="sig-prename descclassname"><span class="pre">ves.config_creation.</span></span><span class="sig-name descname"><span class="pre">singleParticle1D_init_coord</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">potential</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#ves.potentials.Potential1D" title="ves.potentials.Potential1D"><span class="pre">ves.potentials.Potential1D</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">temp</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ntrials</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xmin</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xmax</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ves.config_creation.singleParticle1D_init_coord" title="Permalink to this definition"></a></dt>
+<dd><p>Uses monte carlo trials to place a particle on a free energy surface
+defined by <cite>potential</cite>.</p>
+<p>Attempts are made within bounds (xmin, xmax).</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ves.config_creation.singleParticle2D_init_coord">
+<span class="sig-prename descclassname"><span class="pre">ves.config_creation.</span></span><span class="sig-name descname"><span class="pre">singleParticle2D_init_coord</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">potential</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#ves.potentials.Potential2D" title="ves.potentials.Potential2D"><span class="pre">ves.potentials.Potential2D</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">temp</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ntrials</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xmin</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xmax</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ymin</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ymax</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ves.config_creation.singleParticle2D_init_coord" title="Permalink to this definition"></a></dt>
+<dd><p>Uses monte carlo trials to place a particle on a free energy surface
+defined by <cite>potential</cite>.</p>
+<p>Attempts are made within bounds (xmin, xmax) and (ymin, ymax).</p>
+</dd></dl>
+
+</section>
+<section id="module-ves.langevin_dynamics">
+<span id="ves-langevin-dynamics-module"></span><h2>ves.langevin_dynamics module<a class="headerlink" href="#module-ves.langevin_dynamics" title="Permalink to this headline"></a></h2>
+<p>Classes for performing biased langevin dynamics simulations
+using OpenMM.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="ves.langevin_dynamics.SingleParticleSimulation">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ves.langevin_dynamics.</span></span><span class="sig-name descname"><span class="pre">SingleParticleSimulation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">potential</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">openmm.openmm.CustomExternalForce</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mass</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">temp</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">300</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">friction</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timestep</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">init_state</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">openmm.openmm.State</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">init_coord</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">numpy.ndarray</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">array([[0,</span> <span class="pre">0,</span> <span class="pre">0]])</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gpu</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cpu_threads</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">traj_in_mem</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ves.langevin_dynamics.SingleParticleSimulation" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Performs langevin dynamics simulation of a particle on a 2D potential energy surface
+with an optional VES bias.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="ves.langevin_dynamics.SingleParticleSimulation.init_ves">
+<span class="sig-name descname"><span class="pre">init_ves</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bias</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#ves.bias.Bias" title="ves.bias.Bias"><span class="pre">ves.bias.Bias</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">static</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">startafter</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">learnevery</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">50</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ves.langevin_dynamics.SingleParticleSimulation.init_ves" title="Permalink to this definition"></a></dt>
+<dd><p>Initialize simulation with VES bias.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-ves.potentials">
+<span id="ves-potentials-module"></span><h2>ves.potentials module<a class="headerlink" href="#module-ves.potentials" title="Permalink to this headline"></a></h2>
+<p>Classes defining potential energy surfaces.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="ves.potentials.CatchBondPotential2D">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ves.potentials.</span></span><span class="sig-name descname"><span class="pre">CatchBondPotential2D</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">force_x</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">force_y</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_scale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_shift</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xy_0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xy_scale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gx_0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gx_scale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gy_0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-</span> <span class="pre">2.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gy_scale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.25</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ves.potentials.CatchBondPotential2D" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#ves.potentials.Potential2D" title="ves.potentials.Potential2D"><code class="xref py py-class docutils literal notranslate"><span class="pre">ves.potentials.Potential2D</span></code></a></p>
+<p>3-basin catch bond potential (slip bond potential with an extra harmonic basin).</p>
+<p><div class="math notranslate nohighlight">
+\[U(x, y) = -\ln \left[ e^{-\left( \left(\frac{(y - y_0)^2}{y_{scale}} - y_{shift} \right)^2 + \frac{(x - y - xy_{shift})^2}{2} \right) }
++ e^-{(x - gx_0)^2 / gx_scale + (y - gy_0)^2 / gy_scale} \right]\]</div>
+</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="ves.potentials.CatchBondPotential2D.potential">
+<span class="sig-name descname"><span class="pre">potential</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ves.potentials.CatchBondPotential2D.potential" title="Permalink to this definition"></a></dt>
+<dd><p>Computes the catch bond potential at a given point (x, y).</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="ves.potentials.DoubleWellPotential1D">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ves.potentials.</span></span><span class="sig-name descname"><span class="pre">DoubleWellPotential1D</span></span><a class="headerlink" href="#ves.potentials.DoubleWellPotential1D" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#ves.potentials.Potential1D" title="ves.potentials.Potential1D"><code class="xref py py-class docutils literal notranslate"><span class="pre">ves.potentials.Potential1D</span></code></a></p>
+<p>1D double well potential.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="ves.potentials.DoubleWellPotential1D.potential">
+<span class="sig-name descname"><span class="pre">potential</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ves.potentials.DoubleWellPotential1D.potential" title="Permalink to this definition"></a></dt>
+<dd><p>Computes the potential at a given point x.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>x</strong> (<em>float</em>) – Point to compute potential at.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Value of potential at x.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>V (float)</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="ves.potentials.DoubleWellPotential2D">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ves.potentials.</span></span><span class="sig-name descname"><span class="pre">DoubleWellPotential2D</span></span><a class="headerlink" href="#ves.potentials.DoubleWellPotential2D" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#ves.potentials.Potential2D" title="ves.potentials.Potential2D"><code class="xref py py-class docutils literal notranslate"><span class="pre">ves.potentials.Potential2D</span></code></a></p>
+<p>Double well potential.</p>
+<p><div class="math notranslate nohighlight">
+\[U(x, y) = 10(x^4 - 4 x^2 + 0.7 x) + 5 y^2\]</div>
+</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="ves.potentials.DoubleWellPotential2D.potential">
+<span class="sig-name descname"><span class="pre">potential</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ves.potentials.DoubleWellPotential2D.potential" title="Permalink to this definition"></a></dt>
+<dd><p>Computes the double well potential at a given point (x, y).</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="ves.potentials.MullerBrownPotential">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ves.potentials.</span></span><span class="sig-name descname"><span class="pre">MullerBrownPotential</span></span><a class="headerlink" href="#ves.potentials.MullerBrownPotential" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#ves.potentials.Potential2D" title="ves.potentials.Potential2D"><code class="xref py py-class docutils literal notranslate"><span class="pre">ves.potentials.Potential2D</span></code></a></p>
+<p>2D Muller-Brown potential.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ves.potentials.MullerBrownPotential.A">
+<span class="sig-name descname"><span class="pre">A</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[-200,</span> <span class="pre">-100,</span> <span class="pre">-170,</span> <span class="pre">15]</span></em><a class="headerlink" href="#ves.potentials.MullerBrownPotential.A" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ves.potentials.MullerBrownPotential.a">
+<span class="sig-name descname"><span class="pre">a</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[-1,</span> <span class="pre">-1,</span> <span class="pre">-6.5,</span> <span class="pre">0.7]</span></em><a class="headerlink" href="#ves.potentials.MullerBrownPotential.a" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ves.potentials.MullerBrownPotential.b">
+<span class="sig-name descname"><span class="pre">b</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[0,</span> <span class="pre">0,</span> <span class="pre">11,</span> <span class="pre">0.6]</span></em><a class="headerlink" href="#ves.potentials.MullerBrownPotential.b" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ves.potentials.MullerBrownPotential.c">
+<span class="sig-name descname"><span class="pre">c</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[-10,</span> <span class="pre">-10,</span> <span class="pre">-6.5,</span> <span class="pre">0.7]</span></em><a class="headerlink" href="#ves.potentials.MullerBrownPotential.c" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ves.potentials.MullerBrownPotential.potential">
+<span class="sig-name descname"><span class="pre">potential</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ves.potentials.MullerBrownPotential.potential" title="Permalink to this definition"></a></dt>
+<dd><p>Compute the Muller-Brown potential at a given point (x, y).</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ves.potentials.MullerBrownPotential.x_bar">
+<span class="sig-name descname"><span class="pre">x_bar</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[1,</span> <span class="pre">0,</span> <span class="pre">-0.5,</span> <span class="pre">-1]</span></em><a class="headerlink" href="#ves.potentials.MullerBrownPotential.x_bar" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ves.potentials.MullerBrownPotential.y_bar">
+<span class="sig-name descname"><span class="pre">y_bar</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[0,</span> <span class="pre">0.5,</span> <span class="pre">1.5,</span> <span class="pre">1]</span></em><a class="headerlink" href="#ves.potentials.MullerBrownPotential.y_bar" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="ves.potentials.Potential1D">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ves.potentials.</span></span><span class="sig-name descname"><span class="pre">Potential1D</span></span><a class="headerlink" href="#ves.potentials.Potential1D" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">openmm.openmm.CustomExternalForce</span></code></p>
+<p>Abstract class defining basic 1D potential behavior.</p>
+<p>A harmonic restraining potential of magnitude 1000 kJ/mol is applied on the
+y and z coordinates about y=0 and z=0.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Child classes must call super.__init__() only after initializing the force
+attribute in the x variable.</p>
+</div>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ves.potentials.Potential1D.force">
+<span class="sig-name descname"><span class="pre">force</span></span><a class="headerlink" href="#ves.potentials.Potential1D.force" title="Permalink to this definition"></a></dt>
+<dd><p><a class="reference external" href="http://docs.openmm.org/latest/userguide/theory/03_custom_forces.html#writing-custom-expressions">OpenMM-compatible custom force expression</a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ves.potentials.Potential1D.potential">
+<span class="sig-name descname"><span class="pre">potential</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ves.potentials.Potential1D.potential" title="Permalink to this definition"></a></dt>
+<dd><p>Computes the potential at a given point x.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>x</strong> (<em>float</em>) – Point to compute potential at.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Value of potential at x.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>V (float)</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="ves.potentials.Potential2D">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ves.potentials.</span></span><span class="sig-name descname"><span class="pre">Potential2D</span></span><a class="headerlink" href="#ves.potentials.Potential2D" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">openmm.openmm.CustomExternalForce</span></code></p>
+<p>Abstract class defining basic 2D potential behavior.</p>
+<p>A harmonic restraining potential of magnitude 1000 kJ/mol is applied on the
+z coordinates about z=0.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Child classes must call super.__init__() only after initializing the force
+attribute in x and y variables.</p>
+</div>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ves.potentials.Potential2D.force">
+<span class="sig-name descname"><span class="pre">force</span></span><a class="headerlink" href="#ves.potentials.Potential2D.force" title="Permalink to this definition"></a></dt>
+<dd><p><a class="reference external" href="http://docs.openmm.org/latest/userguide/theory/03_custom_forces.html#writing-custom-expressions">OpenMM-compatible custom force expression</a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ves.potentials.Potential2D.potential">
+<span class="sig-name descname"><span class="pre">potential</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ves.potentials.Potential2D.potential" title="Permalink to this definition"></a></dt>
+<dd><p>Computes the potential at a given point (x, y).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<em>float</em>) – x-coordinate of the point to compute potential at.</p></li>
+<li><p><strong>y</strong> (<em>float</em>) – y-coordinate of the point to compute potential at.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Value of potential at (x, y).</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>V (float)</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="ves.potentials.SingleWellPotential1D">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ves.potentials.</span></span><span class="sig-name descname"><span class="pre">SingleWellPotential1D</span></span><a class="headerlink" href="#ves.potentials.SingleWellPotential1D" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#ves.potentials.Potential1D" title="ves.potentials.Potential1D"><code class="xref py py-class docutils literal notranslate"><span class="pre">ves.potentials.Potential1D</span></code></a></p>
+<p>1D single well potential.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="ves.potentials.SingleWellPotential1D.potential">
+<span class="sig-name descname"><span class="pre">potential</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ves.potentials.SingleWellPotential1D.potential" title="Permalink to this definition"></a></dt>
+<dd><p>Computes the potential at a given point x.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>x</strong> (<em>float</em>) – Point to compute potential at.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Value of potential at x.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>V (float)</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="ves.potentials.SingleWellPotential2D">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ves.potentials.</span></span><span class="sig-name descname"><span class="pre">SingleWellPotential2D</span></span><a class="headerlink" href="#ves.potentials.SingleWellPotential2D" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#ves.potentials.Potential2D" title="ves.potentials.Potential2D"><code class="xref py py-class docutils literal notranslate"><span class="pre">ves.potentials.Potential2D</span></code></a></p>
+<p>Single well potential.</p>
+<p><div class="math notranslate nohighlight">
+\[U(x, y) = x^2 + y^2\]</div>
+</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="ves.potentials.SingleWellPotential2D.potential">
+<span class="sig-name descname"><span class="pre">potential</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ves.potentials.SingleWellPotential2D.potential" title="Permalink to this definition"></a></dt>
+<dd><p>Computes the single well potential at a given point (x, y).</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="ves.potentials.SlipBondPotential2D">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ves.potentials.</span></span><span class="sig-name descname"><span class="pre">SlipBondPotential2D</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">force_x</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">force_y</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_scale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_shift</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xy_0</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xy_scale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ves.potentials.SlipBondPotential2D" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#ves.potentials.Potential2D" title="ves.potentials.Potential2D"><code class="xref py py-class docutils literal notranslate"><span class="pre">ves.potentials.Potential2D</span></code></a></p>
+<p>2-basin slip bond potential.</p>
+<p><div class="math notranslate nohighlight">
+\[U(x, y) = \left( \left(\frac{(y - y\_0)^2}{y\_scale} - y\_shift \right)^2 + \frac{(x - y - xy\_0)^2}{xy\_scale} \right)\]</div>
+</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="ves.potentials.SlipBondPotential2D.potential">
+<span class="sig-name descname"><span class="pre">potential</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ves.potentials.SlipBondPotential2D.potential" title="Permalink to this definition"></a></dt>
+<dd><p>Computes the slip bond potential at a given point (x, y).</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="ves.potentials.SzaboBerezhkovskiiPotential">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ves.potentials.</span></span><span class="sig-name descname"><span class="pre">SzaboBerezhkovskiiPotential</span></span><a class="headerlink" href="#ves.potentials.SzaboBerezhkovskiiPotential" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#ves.potentials.Potential2D" title="ves.potentials.Potential2D"><code class="xref py py-class docutils literal notranslate"><span class="pre">ves.potentials.Potential2D</span></code></a></p>
+<p>2D Szabo-Berezhkovskii potential.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ves.potentials.SzaboBerezhkovskiiPotential.Delta">
+<span class="sig-name descname"><span class="pre">Delta</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">4.840000000000001</span></em><a class="headerlink" href="#ves.potentials.SzaboBerezhkovskiiPotential.Delta" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ves.potentials.SzaboBerezhkovskiiPotential.Omega2">
+<span class="sig-name descname"><span class="pre">Omega2</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">4.04</span></em><a class="headerlink" href="#ves.potentials.SzaboBerezhkovskiiPotential.Omega2" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ves.potentials.SzaboBerezhkovskiiPotential.omega2">
+<span class="sig-name descname"><span class="pre">omega2</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">4.0</span></em><a class="headerlink" href="#ves.potentials.SzaboBerezhkovskiiPotential.omega2" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ves.potentials.SzaboBerezhkovskiiPotential.potential">
+<span class="sig-name descname"><span class="pre">potential</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ves.potentials.SzaboBerezhkovskiiPotential.potential" title="Permalink to this definition"></a></dt>
+<dd><p>Computes the Szabo-Berezhkovskii potential at a given point (x, y).</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ves.potentials.SzaboBerezhkovskiiPotential.x0">
+<span class="sig-name descname"><span class="pre">x0</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">2.2</span></em><a class="headerlink" href="#ves.potentials.SzaboBerezhkovskiiPotential.x0" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-ves.target">
+<span id="ves-target-module"></span><h2>ves.target module<a class="headerlink" href="#module-ves.target" title="Permalink to this headline"></a></h2>
+<p>Class defining VES target free energy landscape.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="ves.target.Target_Uniform_HardSwitch_x">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ves.target.</span></span><span class="sig-name descname"><span class="pre">Target_Uniform_HardSwitch_x</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mesh</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ves.target.Target_Uniform_HardSwitch_x" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#ves.target.Target_x" title="ves.target.Target_x"><code class="xref py py-class docutils literal notranslate"><span class="pre">ves.target.Target_x</span></code></a></p>
+<p>Distribution is uniform over interval [-1, 1]. Outside of this, it is zero.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="ves.target.Target_x">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ves.target.</span></span><span class="sig-name descname"><span class="pre">Target_x</span></span><a class="headerlink" href="#ves.target.Target_x" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Abstract class defining VES target probability distribution.</p>
+<dl class="py property">
+<dt class="sig sig-object py" id="ves.target.Target_x.p">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">p</span></span><a class="headerlink" href="#ves.target.Target_x.p" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="ves.target.Target_x.x">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">x</span></span><a class="headerlink" href="#ves.target.Target_x.x" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-ves.utils">
+<span id="ves-utils-module"></span><h2>ves.utils module<a class="headerlink" href="#module-ves.utils" title="Permalink to this headline"></a></h2>
+<p>Miscellanious utility classes and functions.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="ves.utils.TrajectoryReader">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ves.utils.</span></span><span class="sig-name descname"><span class="pre">TrajectoryReader</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">traj_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comment_char</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'#'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">format</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'txyz'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ves.utils.TrajectoryReader" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Utility class for reading large trajectories.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>traj_file</strong> (<em>str</em>) – Path to trajectory file.</p></li>
+<li><p><strong>comment_char</strong> (<em>str</em>) – Character marking the beginning of a comment line.</p></li>
+<li><p><strong>format</strong> (<em>str</em>) – Format of each line (options = ‘txyz’ or ‘xyz’; default = ‘txyz’)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="ves.utils.TrajectoryReader.read_traj">
+<span class="sig-name descname"><span class="pre">read_traj</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">skip</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ves.utils.TrajectoryReader.read_traj" title="Permalink to this definition"></a></dt>
+<dd><p>Reads trajectory.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>skip</strong> (<em>int</em>) – Number of frames to skip between reads (default = 1).</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>tuple(T, traj) if self.format == ‘txyz’
+traj if self.format == ‘xyz’</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-ves.visualization">
+<span id="ves-visualization-module"></span><h2>ves.visualization module<a class="headerlink" href="#module-ves.visualization" title="Permalink to this headline"></a></h2>
+<p>Classes for visualizing trajectory data.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="ves.visualization.VisualizePotential1D">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ves.visualization.</span></span><span class="sig-name descname"><span class="pre">VisualizePotential1D</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">potential1D</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#ves.potentials.Potential1D" title="ves.potentials.Potential1D"><span class="pre">ves.potentials.Potential1D</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">temp</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xrange</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mesh</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">200</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ves.visualization.VisualizePotential1D" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Class defining functions to generate scatter plots and animated trajectories
+of a particle on a 1D potential.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>potential1D</strong> – </p></li>
+<li><p><strong>temp</strong> – </p></li>
+<li><p><strong>xrange</strong> – </p></li>
+<li><p><strong>mesh</strong> – </p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="ves.visualization.VisualizePotential1D.animate_traj">
+<span class="sig-name descname"><span class="pre">animate_traj</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">traj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outdir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">every</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">s</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">c</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'black'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">call_ffmpeg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ves.visualization.VisualizePotential1D.animate_traj" title="Permalink to this definition"></a></dt>
+<dd><p>Plots positions at timesteps defined by interval <cite>every</cite> on potential
+energy surface and stitches together plots using ffmpeg to make a movie.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>traj</strong> (<em>iterable</em>) – </p></li>
+<li><p><strong>outdir</strong> (<em>str</em>) – </p></li>
+<li><p><strong>every</strong> (<em>int</em>) – </p></li>
+<li><p><strong>s</strong> (<em>int</em>) – </p></li>
+<li><p><strong>c</strong> (<em>str</em>) – </p></li>
+<li><p><strong>call_ffmpeg</strong> (<em>bool</em>) – </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ves.visualization.VisualizePotential1D.plot_potential">
+<span class="sig-name descname"><span class="pre">plot_potential</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ves.visualization.VisualizePotential1D.plot_potential" title="Permalink to this definition"></a></dt>
+<dd><p>Plots the potential within (xrange[0], xrange[1]).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ves.visualization.VisualizePotential1D.scatter_traj">
+<span class="sig-name descname"><span class="pre">scatter_traj</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">traj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outimg</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">every</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">s</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">c</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'black'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ves.visualization.VisualizePotential1D.scatter_traj" title="Permalink to this definition"></a></dt>
+<dd><p>Scatters entire trajectory onto potential energy surface.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>traj</strong> – </p></li>
+<li><p><strong>outimg</strong> – </p></li>
+<li><p><strong>every</strong> – </p></li>
+<li><p><strong>s</strong> – </p></li>
+<li><p><strong>c</strong> – </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="ves.visualization.VisualizePotential2D">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ves.visualization.</span></span><span class="sig-name descname"><span class="pre">VisualizePotential2D</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">potential2D</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#ves.potentials.Potential2D" title="ves.potentials.Potential2D"><span class="pre">ves.potentials.Potential2D</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">temp</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xrange</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">yrange</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">contourvals</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clip</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mesh</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">200</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cmap</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'jet'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ves.visualization.VisualizePotential2D" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Class defining functions to generate scatter plots and animated trajectories
+of a particle on a 2D potential surface.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>potential2D</strong> (<em>pyib.md.potentials.Potential2D</em>) – 2D potential energy surface.</p></li>
+<li><p><strong>temp</strong> (<em>float</em>) – Temperature (required, as free energies are plotted in kT).</p></li>
+<li><p><strong>xrange</strong> (<em>tuple of length 2</em>) – Range of x-values to plot.</p></li>
+<li><p><strong>yrange</strong> (<em>tuple of length 2</em>) – Range of y-values to plot.</p></li>
+<li><p><strong>contourvals</strong> (<em>int</em><em> or </em><em>array-like</em>) – Determines the number and positions of the contour lines / regions. Refer to the <a class="reference external" href="https://matplotlib.org/3.5.1/api/_as_gen/matplotlib.pyplot.contour.html">matplotlib documentation</a> for details.</p></li>
+<li><p><strong>clip</strong> (<em>float</em>) – Value of free energy (in kT) to clip contour plot at.</p></li>
+<li><p><strong>mesh</strong> – Number of mesh points in each dimension for contour plot.</p></li>
+<li><p><strong>cmap</strong> – Matplotlib colormap.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="ves.visualization.VisualizePotential2D.animate_traj">
+<span class="sig-name descname"><span class="pre">animate_traj</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">traj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outdir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">every</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">s</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">c</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'black'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">call_ffmpeg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ves.visualization.VisualizePotential2D.animate_traj" title="Permalink to this definition"></a></dt>
+<dd><p>Plots positions at timesteps defined by interval <cite>every</cite> on potential
+energy surface and stitches together plots using ffmpeg to make a movie.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>traj</strong> (<em>iterable</em>) – </p></li>
+<li><p><strong>outdir</strong> (<em>str</em>) – </p></li>
+<li><p><strong>every</strong> (<em>int</em>) – </p></li>
+<li><p><strong>s</strong> (<em>int</em>) – </p></li>
+<li><p><strong>c</strong> (<em>str</em>) – </p></li>
+<li><p><strong>call_ffmpeg</strong> (<em>bool</em>) – </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ves.visualization.VisualizePotential2D.animate_traj_projection_x">
+<span class="sig-name descname"><span class="pre">animate_traj_projection_x</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">traj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outdir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">every</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">s</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">c</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'black'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">call_ffmpeg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ves.visualization.VisualizePotential2D.animate_traj_projection_x" title="Permalink to this definition"></a></dt>
+<dd><p>Plots positions at timesteps defined by interval <cite>every</cite> on the x-projection of the
+potential energy surface and stitches together plots using ffmpeg to make a movie.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>traj</strong> (<em>iterable</em>) – </p></li>
+<li><p><strong>outdir</strong> (<em>str</em>) – </p></li>
+<li><p><strong>every</strong> (<em>int</em>) – </p></li>
+<li><p><strong>s</strong> (<em>int</em>) – </p></li>
+<li><p><strong>c</strong> (<em>str</em>) – </p></li>
+<li><p><strong>call_ffmpeg</strong> (<em>bool</em>) – </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ves.visualization.VisualizePotential2D.animate_traj_projection_y">
+<span class="sig-name descname"><span class="pre">animate_traj_projection_y</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">traj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outdir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">every</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">s</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">c</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'black'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">call_ffmpeg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ves.visualization.VisualizePotential2D.animate_traj_projection_y" title="Permalink to this definition"></a></dt>
+<dd><p>Plots positions at timesteps defined by interval <cite>every</cite> on the x-projection of the
+potential energy surface and stitches together plots using ffmpeg to make a movie.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>traj</strong> (<em>iterable</em>) – </p></li>
+<li><p><strong>outdir</strong> (<em>str</em>) – </p></li>
+<li><p><strong>every</strong> (<em>int</em>) – </p></li>
+<li><p><strong>s</strong> (<em>int</em>) – </p></li>
+<li><p><strong>c</strong> (<em>str</em>) – </p></li>
+<li><p><strong>call_ffmpeg</strong> (<em>bool</em>) – </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ves.visualization.VisualizePotential2D.plot_potential">
+<span class="sig-name descname"><span class="pre">plot_potential</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ves.visualization.VisualizePotential2D.plot_potential" title="Permalink to this definition"></a></dt>
+<dd><p>Plots the potential within (xrange[0], xrange[1]) and (yrange[0], yrange[1]).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ves.visualization.VisualizePotential2D.plot_projection_x">
+<span class="sig-name descname"><span class="pre">plot_projection_x</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ves.visualization.VisualizePotential2D.plot_projection_x" title="Permalink to this definition"></a></dt>
+<dd><p>Plots the x-projection of potential within (xrange[0], xrange[1])
+and (yrange[0], yrange[1]).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ves.visualization.VisualizePotential2D.plot_projection_y">
+<span class="sig-name descname"><span class="pre">plot_projection_y</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#ves.visualization.VisualizePotential2D.plot_projection_y" title="Permalink to this definition"></a></dt>
+<dd><p>Plots the y-projection of potential within (xrange[0], xrange[1])
+and (yrange[0], yrange[1]).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ves.visualization.VisualizePotential2D.scatter_traj">
+<span class="sig-name descname"><span class="pre">scatter_traj</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">traj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outimg</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">every</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">s</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">c</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'black'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ves.visualization.VisualizePotential2D.scatter_traj" title="Permalink to this definition"></a></dt>
+<dd><p>Scatters entire trajectory onto potential energy surface.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>traj</strong> – </p></li>
+<li><p><strong>outimg</strong> – </p></li>
+<li><p><strong>every</strong> – </p></li>
+<li><p><strong>s</strong> – </p></li>
+<li><p><strong>c</strong> – </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ves.visualization.VisualizePotential2D.scatter_traj_projection_x">
+<span class="sig-name descname"><span class="pre">scatter_traj_projection_x</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">traj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outimg</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">every</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">s</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">c</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'black'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ves.visualization.VisualizePotential2D.scatter_traj_projection_x" title="Permalink to this definition"></a></dt>
+<dd><p>Scatters x-projection of entire trajectory onto potential energy surface.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>traj</strong> – </p></li>
+<li><p><strong>outimg</strong> – </p></li>
+<li><p><strong>every</strong> – </p></li>
+<li><p><strong>s</strong> – </p></li>
+<li><p><strong>c</strong> – </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ves.visualization.VisualizePotential2D.scatter_traj_projection_y">
+<span class="sig-name descname"><span class="pre">scatter_traj_projection_y</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">traj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outimg</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">every</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">s</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">c</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'black'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ves.visualization.VisualizePotential2D.scatter_traj_projection_y" title="Permalink to this definition"></a></dt>
+<dd><p>Scatters y-projection of entire trajectory onto potential energy surface.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>traj</strong> – </p></li>
+<li><p><strong>outimg</strong> – </p></li>
+<li><p><strong>every</strong> – </p></li>
+<li><p><strong>s</strong> – </p></li>
+<li><p><strong>c</strong> – </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ves.visualization.visualize_free_energy_2D">
+<span class="sig-prename descclassname"><span class="pre">ves.visualization.</span></span><span class="sig-name descname"><span class="pre">visualize_free_energy_2D</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">xvals</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">yvals</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xrange</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">yrange</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nbins_x</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nbins_y</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">contourvals</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clip</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cmap</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'jet'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dpi</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">150</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#ves.visualization.visualize_free_energy_2D" title="Permalink to this definition"></a></dt>
+<dd><p>Plots 2D free energy profile from 2D trajectory data.
+:param xvals: Array of x coordinates of points to bin.
+:type xvals: numpy.ndarray
+:param yvals: Array of y coordinates of points to bin.
+:type yvals: numpy.ndarray
+:param xrange: Range of x-values to plot.
+:type xrange: tuple of length 2
+:param yrange: Range of y-values to plot.
+:type yrange: tuple of length 2
+:param nbins_x: Number of bins along the x-axis (default=100).
+:type nbins_x: int
+:param nbins_y: Number of bins along the y-axis (default=100).
+:type nbins_y: int
+:param contourvals: Determines the number and positions of the contour lines / regions. Refer to the <a class="reference external" href="https://matplotlib.org/3.5.1/api/_as_gen/matplotlib.pyplot.contour.html">matplotlib documentation</a> for details.
+:type contourvals: int or array-like
+:param clip: Value of free energy (in kT) to clip contour plot at.
+:type clip: float
+:param cmap: Matplotlib colormap (default=jet).
+:param dpi: Output DPI (default=150).</p>
+</dd></dl>
+
+</section>
+<section id="module-ves">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-ves" title="Permalink to this headline"></a></h2>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../index.html" class="btn btn-neutral float-left" title="pyves" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Akash Pallath.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

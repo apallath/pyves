@@ -19,17 +19,17 @@ class LegendreBasis1D(torch.nn.Module):
     The coordinates x (or y) are scaled to lie within [-1, 1] using the
     [min, max] attributes, as
 
-    $$x' = (x - (min + max) / 2) / ((max - min) / 2)$$
+    $$x' = \frac{x - (min + max) / 2}{(max - min) / 2}$$
 
-    A legendre basis expansion is defined over x', as
+    A legendre basis expansion is defined over $x'$, as
 
-    $$B(x') = \sum{i=0}^{d} w_i P_i(x')$$
+    $$B(x') = \sum_{i=0}^{d} w_i P_i(x')$$
 
-    where P_i is the legendre polynomial of order i, w_i is its coefficient in
-    the expansion, and d is the degree of the expansion.
+    where $P_i$ is the legendre polynomial of degree $i$, $w_i$ is its coefficient in
+    the expansion, and $d$ is the degree of the expansion.
 
     Notes:
-        - Weights w_i are learnable as self.weights is a torch Parameter.
+        - Weights $w_i$ are learnable as `self.weights` is a torch Parameter.
         - This basis expansion can directly be used a TorchForce module.
 
     Attributes:
@@ -38,13 +38,6 @@ class LegendreBasis1D(torch.nn.Module):
         max (float): Max x-/y-value for scaling.
         axis (str): 'x' or 'y' (default='x').
         weights (torch.nn.Parameter): Legendre polynomial coefficients (array len = degree).
-
-    Args:
-        degree (int): Degree of expansion.
-        min (float): Min x-/y-value for scaling.
-        max (float): Max x-/y-value for scaling.
-        axis (str): 'x' or 'y' (default='x').
-        weights (numpy.ndarray): Legendre polynomial coefficients (array len = degree).
     """
     def __init__(self, degree, min, max, axis='x', weights=None):
         super().__init__()
@@ -129,11 +122,11 @@ class NNBasis1D(nn.Module):
 
     $$x' = (x - min) / (max - min)$$
 
-    A nonlinear basis expansion is defined over x' as
+    A nonlinear basis expansion is defined over $x'$ as
 
     $$B(x') = N(x')$$
 
-    where N is a neural network.
+    where $N$ is a neural network.
 
     Notes:
         - Neural network weights are learnable.
@@ -144,13 +137,6 @@ class NNBasis1D(nn.Module):
         max (float): Max x-/y-value for scaling.
         axis (str): 'x' or 'y' (default='x').
         layers (torch.nn.ModuleList): List of neural layers.
-
-    Args:
-        min (float): Min x-/y-value for scaling.
-        max (float): Max x-/y-value for scaling.
-        axis (str): 'x' or 'y' (default='x').
-        hidden_layer_sizes (list): List of neural network hidden layer sizes.
-        act (torch.nn.Module): Activation (default=torch.nn.ReLU).
     """
     def __init__(self, min, max, axis='x', hidden_layer_sizes=[], act=nn.ReLU):
         super().__init__()
@@ -211,25 +197,25 @@ class NNBasis1D(nn.Module):
 class LegendreBasis2DRadialCV(torch.nn.Module):
     r"""
     Legendre polynomial basis expansion along a radial collective variable (CV) defined in the neighborhood
-    of points (x_min, y_min) and (x_max, y_max).
+    of points $(x_min, y_min)$ and $(x_max, y_max)$.
 
     A point $(x, y)$ is mapped to a CV $s$ as
 
-    $$s = ((x - x_min) ** 2 + (y - y_min) ** 2) / ((x_max - x_min) ** 2 + (y_max - y_min) ** 2)$$
+    $$s = \frac{(x - x_{min})^2 + (y - y_{min})^2}{(x_{max} - x_{min})^2 + (y_{max} - y_{min})^2}$$
 
     and then scaled to lie within [-1, 1] as
 
     $$s' = (s - 1/2) / (1/2)$$
 
-    A legendre basis expansion is defined over s', as
+    A legendre basis expansion is defined over $s'$, as
 
-    $$B(s') = \sum{i=0}^{d} w_i P_i(s')$$
+    $$B(s') = \sum_{i=0}^{d} w_i P_i(s')$$
 
-    where P_i is the legendre polynomial of order i, w_i is its coefficient in
-    the expansion, and d is the degree of the expansion.
+    where $P_i$ is the legendre polynomial of order $i$, $w_i$ is its coefficient in
+    the expansion, and $d$ is the degree of the expansion.
 
     Notes:
-        - Weights w_i are learnable as self.weights is a torch Parameter.
+        - Weights $w_i$ are learnable as `self.weights` is a torch Parameter.
         - This basis expansion can directly be used a TorchForce module.
 
     Attributes:
@@ -239,14 +225,6 @@ class LegendreBasis2DRadialCV(torch.nn.Module):
         x_max (float): End x-coordinate.
         y_max (float): End y-coordinate.
         weights (torch.nn.Parameter): Legendre polynomial coefficients (array len = degree).
-
-    Args:
-        degree (int): Degree of basis.
-        x_min (float): Start x-coordinate.
-        y_min (float): Start y-coordinate.
-        x_max (float): End x-coordinate.
-        y_max (float): End y-coordinate.
-        weights (numpy.ndarray): Legendre polynomial coefficients (array len = degree).
     """
     def __init__(self, degree, x_min, y_min, x_max, y_max, weights=None):
         super().__init__()
@@ -330,31 +308,103 @@ class LegendreBasis2DPathCV(torch.nn.Module):
     the point parallel to the path and perpendicular to the path respectively, 
     are computed as
 
-    $$s = $$
+    $$s = \sum_{i=0}^{N-1} \frac{ 1 / (N - 1) \exp(-\lambda \sqrt{(x - x_i) ^ 2 + (y - y_i) ^ 2})}{\exp(-\lambda \sqrt{(x - x_i) ^ 2 + (y - y_i) ^ 2})}$$
 
-    $$z = $$
+    $$z = -\frac{1}{\lambda} \ln (\exp(-\lambda \sqrt{(x - x_i) ^ 2 + (y - y_i) ^ 2}))$$
 
     The CV $s$ is scaled to lie within [-1, 1] as
 
     $$s' = (s - 1/2) / (1/2)$$
 
-    A legendre basis expansion is defined over s', as
+    A legendre basis expansion is defined over $s'$, as
 
-    $$B(s') = \sum{i=0}^{d} w_i P_i(s')$$
+    $$B(s') = \sum_{i=0}^{d} w_i P_i(s')$$
 
-    where P_i is the legendre polynomial of order i, w_i is its coefficient in
-    the expansion, and d is the degree of the expansion.
+    where $P_i$ is the legendre polynomial of order $i$, $w_i$ is its coefficient in
+    the expansion, and $d$ is the degree of the expansion.
 
-    A harmonic bias is defined to restrict
+    A restraining harmonic bias is defined to restrict sampling to regions near the path, as
+
+    $$U(z) = \frac{\kappa}{2} z^2$$
 
     This basis expansion can directly be used a TorchForce module.
 
     Attributes:
         degree (int): Degree of basis.
-        x_min (float): Start x-coordinate.
-        y_min (float): Start y-coordinate.
-        x_max (float): End x-coordinate.
-        y_max (float): End y-coordinate.
-        weights (numpy.ndarray): Legendre polynomial coefficients (array len = degree).
+        x_i (torch.DoubleTensor): x-coordinates of images along the path.
+        y_i (torch.DoubleTensor): y-coordinates of images along the path.
+        gamma_i (torch.DoubleTensor): 
+        lam (float): Value of $\lambda$.
+        weights (torch.nn.Parameter): Legendre polynomial coefficients of expansion along $s$ (array len = degree).
+        kappa (torch.DoubleTensor): Strength of restraining harmonic potential along $z$.
     """
-    pass
+    def __init__(self, degree, x_i, y_i, gamma_i, lam, weights=None, kappa=0):
+        super().__init__()
+        self.degree = degree
+        self.x_i = torch.from_numpy(x_i).type(torch.DoubleTensor)
+        self.y_i = torch.from_numpy(y_i).type(torch.DoubleTensor)
+        self.lam = lam
+
+        if weights is not None:
+            weights_tensor = torch.from_numpy(weights).type(torch.DoubleTensor)
+        else:
+            weights_tensor = torch.rand(degree).type(torch.DoubleTensor)
+        self.weights = nn.Parameter(weights_tensor)
+
+    @classmethod
+    def legendre_polynomial(cls, x, degree: int) -> torch.Tensor:
+        r"""
+        Computes a legendre polynomial of degree $n$ using dynamic programming
+        and the Bonnet's recursion formula:
+
+        $$(n + 1) P_{n+1}(x) = (2n + 1) x P_n(x) - nP_{n-1}(x)$$
+        """
+        if degree == 0:
+            ones_list = x.size(0) * [1.0]
+            return torch.tensor(ones_list, requires_grad=True).type(x.type())
+
+        elif degree == 1:
+            return x
+
+        else:
+            ones_list = x.size(0) * [1.0]
+            P_n_minus = torch.tensor(ones_list, requires_grad=True).type(x.type())
+            P_n = x
+
+            for n in range(1, degree):
+                P_n_plus = ((2 * n + 1) * x * P_n - n * P_n_minus) / (n + 1)
+
+                # Replace
+                P_n_minus = P_n
+                P_n = P_n_plus
+            return P_n
+
+    def forward(self, positions):
+        """The forward method returns the energy computed from positions.
+
+        Args:
+            positions : torch.Tensor with shape (1, 3)
+                positions[0, k] is the position (in nanometers) of spatial dimension k of particle 0
+
+        Returns:
+            potential : torch.Scalar
+                The potential energy (in kJ/mol)
+        """
+        # Compute string position
+        x = positions[:, 0]
+        y = positions[:, 1]
+
+        # Compute parallel distance OP s
+        s = torch.exp()
+
+        # Scale to [-1, 1]
+        s = (s - 0.5) / 0.5
+
+        # Clamp to prevent s from going outside Legendre polynomial domain
+        s = torch.clamp(s, min=-1, max=1)
+
+        # Apply legendre expansion bias
+        bias = torch.zeros_like(s)
+        for i in range(self.degree):
+            bias += self.weights[i] * self.legendre_polynomial(s, i)
+        return bias
