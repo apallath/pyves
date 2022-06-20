@@ -307,7 +307,7 @@ class LegendreBasis2DPathCV(torch.nn.Module):
     the point parallel to the path and perpendicular to the path respectively, 
     are computed as
 
-    $$s = \frac{1}{N - 1} \frac{\sum_{i=0}^{N-1} i\ e^{-\lambda [(x - x_i) ^ 2 + (y - y_i) ^ 2]}}{\sum_{i=0}^{N-1} e^{-\lambda [(x - x_i) ^ 2 + (y - y_i) ^ 2]}}$$
+    $$s = \frac{1}{N} \frac{\sum_{i=0}^{N-1} (i + 1)\ e^{-\lambda [(x - x_i) ^ 2 + (y - y_i) ^ 2]}}{\sum_{i=0}^{N-1} e^{-\lambda [(x - x_i) ^ 2 + (y - y_i) ^ 2]}}$$
 
     $$z = -\frac{1}{\lambda} \ln (\sum_{i=0}^{N-1} e^{-\lambda [(x - x_i) ^ 2 + (y - y_i) ^ 2]})$$
 
@@ -322,9 +322,9 @@ class LegendreBasis2DPathCV(torch.nn.Module):
     where $P_i$ is the legendre polynomial of order $i$, $w_i$ is its coefficient in
     the expansion, and $d$ is the degree of the expansion.
 
-    A restraining harmonic bias is defined to restrict sampling to regions near the path, as
+    A restraining linear bias is defined to restrict sampling to regions near the path, as
 
-    $$U(z) = \frac{\kappa}{2} z^2$$
+    $$U(z) = \phi z$$
 
     This basis expansion can directly be used a TorchForce module.
 
@@ -335,9 +335,9 @@ class LegendreBasis2DPathCV(torch.nn.Module):
         y_i (torch.DoubleTensor): y-coordinates of images along the path.
         lam (float): Value of $\lambda$ (choose a sufficiently large value).
         weights (torch.nn.Parameter): Legendre polynomial coefficients of expansion along $s$ (array len = degree).
-        kappa (torch.DoubleTensor): Strength of restraining harmonic potential along $z$.
+        phi (torch.DoubleTensor): Strength of restraining potential along $z$.
     """
-    def __init__(self, degree, x_i, y_i, gamma_i, lam, weights=None, kappa=0):
+    def __init__(self, degree, x_i, y_i, lam, weights=None, phi=0):
         super().__init__()
         self.degree = degree
         assert(len(x_i) == len(y_i))
@@ -352,7 +352,7 @@ class LegendreBasis2DPathCV(torch.nn.Module):
             weights_tensor = torch.rand(degree).type(torch.DoubleTensor)
         self.weights = nn.Parameter(weights_tensor)
 
-        self.kappa = kappa
+        self.phi = phi
 
     @classmethod
     def legendre_polynomial(cls, x, degree: int) -> torch.Tensor:
@@ -397,11 +397,12 @@ class LegendreBasis2DPathCV(torch.nn.Module):
         y = positions[:, 1]
 
         # Compute parallel distance OP s
-        ivals = torch.arange(self.Npath).type(torch.DoubleTensor)
-        s = 1 / (self.Npath - 1) * torch.sum(ivals * torch.exp(-self.lam * ((x - self.x_i) ** 2 + (y - self.y_i) ** 2))) / torch.sum(torch.exp(-self.lam * ((x - self.x_i) ** 2 + (y - self.y_i) ** 2)))
+        ivals = torch.arange(1, self.Npath + 1).type(x.type())
+        s = 1 / self.Npath * torch.exp(torch.logsumexp(-self.lam * ((x.unsqueeze(0) - self.x_i.unsqueeze(-1)) ** 2 + (y.unsqueeze(0) - self.y_i.unsqueeze(-1)) ** 2) + torch.log(ivals).unsqueeze(-1), 0) 
+                                       - torch.logsumexp(-self.lam * ((x.unsqueeze(0) - self.x_i.unsqueeze(-1)) ** 2 + (y.unsqueeze(0) - self.y_i.unsqueeze(-1)) ** 2), 0))
 
         # Compute perpendicular distance OP z
-        z = -1 / self.lam * torch.logsumexp(-self.lam * ((x - self.x_i) ** 2 + (y - self.y_i) ** 2))
+        z = -1 / self.lam * torch.logsumexp(-self.lam * ((x.unsqueeze(0) - self.x_i.unsqueeze(-1)) ** 2 + (y.unsqueeze(0) - self.y_i.unsqueeze(-1)) ** 2), 0)
 
         # Scale to [-1, 1]
         s = (s - 0.5) / 0.5
@@ -415,6 +416,6 @@ class LegendreBasis2DPathCV(torch.nn.Module):
             bias += self.weights[i] * self.legendre_polynomial(s, i)
 
         # Apply harmonic bias to z
-        bias += self.kappa * z ** 2
+        bias += self.phi * z
 
         return bias

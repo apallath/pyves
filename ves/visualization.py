@@ -8,6 +8,7 @@ import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
 from scipy.special import logsumexp
+import torch
 from tqdm import tqdm
 
 from ves.potentials import Potential1D
@@ -103,7 +104,11 @@ class VisualizePotential1D:
 class VisualizePotential2D:
     """
     Class defining functions to generate scatter plots and animated trajectories
-    of a particle on a 2D potential surface.
+    of a particle on a 2D potential surface. 
+    
+    The effect of a neural network bias on a landscape can be plotted
+    over by passing a torch.nn.Module object through the `bias` argument and setting `biased = True`
+    when calling any of the plotting functions.
 
     Args:
         potential2D (pyib.md.potentials.Potential2D): 2D potential energy surface.
@@ -114,7 +119,8 @@ class VisualizePotential2D:
         clip (float): Value of free energy (in kT) to clip contour plot at.
         mesh: Number of mesh points in each dimension for contour plot.
         cmap: Matplotlib colormap.
-
+        bias (torch.nn.Module): Bias potential.
+        
     .. _matplotlib documentation: https://matplotlib.org/3.5.1/api/_as_gen/matplotlib.pyplot.contour.html
     """
     def __init__(self,
@@ -125,7 +131,8 @@ class VisualizePotential2D:
                  contourvals=None,
                  clip=None,
                  mesh: int = 200,
-                 cmap: str = 'jet'):
+                 cmap: str = 'jet',
+                 bias: torch.nn.Module = None):
         self.potential2D = potential2D
         self.kT = 8.3145 / 1000 * temp
         self.xrange = xrange
@@ -134,8 +141,9 @@ class VisualizePotential2D:
         self.clip = clip
         self.mesh = mesh
         self.cmap = cmap
+        self.bias = bias
 
-    def plot_potential(self):
+    def plot_potential(self, biased=False):
         """
         Plots the potential within (xrange[0], xrange[1]) and (yrange[0], yrange[1]).
         """
@@ -143,6 +151,13 @@ class VisualizePotential2D:
         x = xx.ravel()
         y = yy.ravel()
         v = self.potential2D.potential(x, y)
+
+        # Apply bias
+        if biased and self.bias is not None:
+            X_tensor = torch.tensor(np.vstack([x, y]).T).type(torch.DoubleTensor)
+            b = self.bias(X_tensor).detach().numpy()
+            v = v + b
+            v -= v.min()
 
         if self.clip is not None:
             V = v.reshape(self.mesh, self.mesh) / self.kT
@@ -161,7 +176,7 @@ class VisualizePotential2D:
         ax.set_ylabel("$y$")
         return (fig, ax)
 
-    def plot_projection_x(self):
+    def plot_projection_x(self, biased=False):
         """
         Plots the x-projection of potential within (xrange[0], xrange[1])
         and (yrange[0], yrange[1]).
@@ -171,6 +186,14 @@ class VisualizePotential2D:
         x = xx.ravel()
         y = yy.ravel()
         v = self.potential2D.potential(x, y)
+
+        # Apply bias
+        if biased and self.bias is not None:
+            X_tensor = torch.tensor(np.vstack([x, y]).T).type(torch.DoubleTensor)
+            b = self.bias(X_tensor).detach().numpy()
+            v = v + b
+            v -= v.min()
+
         V = v.reshape(self.mesh, self.mesh) / self.kT
 
         # Integrate over y-coordinate to get free-energy along x-coordinate
@@ -186,7 +209,7 @@ class VisualizePotential2D:
         ax.set_ylim([0, self.clip])
         return (fig, ax, x, Fx)
 
-    def plot_projection_y(self):
+    def plot_projection_y(self, biased=False):
         """
         Plots the y-projection of potential within (xrange[0], xrange[1])
         and (yrange[0], yrange[1]).
@@ -196,6 +219,14 @@ class VisualizePotential2D:
         x = xx.ravel()
         y = yy.ravel()
         v = self.potential2D.potential(x, y)
+
+        # Apply bias
+        if biased and self.bias is not None:
+            X_tensor = torch.tensor(np.vstack([x, y]).T).type(torch.DoubleTensor)
+            b = self.bias(X_tensor).detach().numpy()
+            v = v + b
+            v -= v.min()
+
         V = v.reshape(self.mesh, self.mesh) / self.kT
 
         # Integrate over x-coordinate to get free-energy along x-coordinate
@@ -211,7 +242,7 @@ class VisualizePotential2D:
         ax.set_ylim([0, self.clip])
         return (fig, ax, y, Fy)
 
-    def scatter_traj(self, traj, outimg, every=1, s=1, c='black'):
+    def scatter_traj(self, traj, outimg, every=1, s=1, c='black', **plotkwargs):
         """
         Scatters entire trajectory onto potential energy surface.
 
@@ -222,12 +253,12 @@ class VisualizePotential2D:
             s:
             c:
         """
-        fig, ax = self.plot_potential()
+        fig, ax = self.plot_potential(**plotkwargs)
         ax.scatter(traj[::every, 0], traj[::every, 1], s=s, c=c)
         plt.savefig(outimg)
         plt.close()
 
-    def scatter_traj_projection_x(self, traj, outimg, every=1, s=1, c='black'):
+    def scatter_traj_projection_x(self, traj, outimg, every=1, s=1, c='black', **plotkwargs):
         """
         Scatters x-projection of entire trajectory onto potential energy surface.
 
@@ -238,7 +269,7 @@ class VisualizePotential2D:
             s:
             c:
         """
-        fig, ax, x, Fx = self.plot_projection_x()
+        fig, ax, x, Fx = self.plot_projection_x(**plotkwargs)
         for i in tqdm(range(0, traj.shape[0], every)):
             xpt = traj[i, 0]
             yloc = np.argmin((x - xpt)**2)
@@ -247,7 +278,7 @@ class VisualizePotential2D:
         plt.savefig(outimg)
         plt.close()
 
-    def scatter_traj_projection_y(self, traj, outimg, every=1, s=1, c='black'):
+    def scatter_traj_projection_y(self, traj, outimg, every=1, s=1, c='black', **plotkwargs):
         """
         Scatters y-projection of entire trajectory onto potential energy surface.
 
@@ -258,7 +289,7 @@ class VisualizePotential2D:
             s:
             c:
         """
-        fig, ax, y, Fy = self.plot_projection_y()
+        fig, ax, y, Fy = self.plot_projection_y(**plotkwargs)
         for i in tqdm(range(0, traj.shape[0], every)):
             xpt = traj[i, 1]
             yloc = np.argmin((y - xpt)**2)
@@ -267,7 +298,7 @@ class VisualizePotential2D:
         plt.savefig(outimg)
         plt.close()
 
-    def animate_traj(self, traj, outdir, every=1, s=3, c='black', call_ffmpeg: bool = True):
+    def animate_traj(self, traj, outdir, every=1, s=3, c='black', call_ffmpeg: bool = True, **plotkwargs):
         """
         Plots positions at timesteps defined by interval `every` on potential
         energy surface and stitches together plots using ffmpeg to make a movie.
@@ -284,7 +315,7 @@ class VisualizePotential2D:
             os.makedirs(outdir)
 
         for t, frame in enumerate(tqdm(traj[::every])):
-            fig, ax = self.plot_potential()
+            fig, ax = self.plot_potential(**plotkwargs)
             ax.scatter(frame[0], frame[1], s=s, c=c)
             plt.savefig("{}/traj.{:05d}.png".format(outdir, t))
             plt.close()
@@ -293,7 +324,7 @@ class VisualizePotential2D:
             os.system("ffmpeg -r 25 -i {}/traj.%5d.png -vb 20M {}/traj.mp4".format(outdir, outdir))
 
     def animate_traj_projection_x(self, traj, outdir, every=1, s=3, c='black',
-                                  call_ffmpeg: bool = True):
+                                  call_ffmpeg: bool = True, **plotkwargs):
         """
         Plots positions at timesteps defined by interval `every` on the x-projection of the
         potential energy surface and stitches together plots using ffmpeg to make a movie.
@@ -310,7 +341,7 @@ class VisualizePotential2D:
             os.makedirs(outdir)
 
         for t, frame in enumerate(tqdm(traj[::every])):
-            fig, ax, x, Fx = self.plot_projection_x()
+            fig, ax, x, Fx = self.plot_projection_x(**plotkwargs)
             xpt = frame[0]
             yloc = np.argmin((x - xpt)**2)
             ypt = Fx[yloc]
@@ -322,7 +353,7 @@ class VisualizePotential2D:
             os.system("ffmpeg -r 25 -i {}/traj_x.%5d.png -vb 20M {}/traj_x.mp4".format(outdir, outdir))
 
     def animate_traj_projection_y(self, traj, outdir, every=1, s=3, c='black',
-                                  call_ffmpeg: bool = True):
+                                  call_ffmpeg: bool = True, **plotkwargs):
         """
         Plots positions at timesteps defined by interval `every` on the x-projection of the
         potential energy surface and stitches together plots using ffmpeg to make a movie.
@@ -339,7 +370,7 @@ class VisualizePotential2D:
             os.makedirs(outdir)
 
         for t, frame in enumerate(tqdm(traj[::every])):
-            fig, ax, y, Fy = self.plot_projection_y()
+            fig, ax, y, Fy = self.plot_projection_y(**plotkwargs)
             xpt = frame[1]
             yloc = np.argmin((y - xpt)**2)
             ypt = Fy[yloc]
@@ -386,7 +417,7 @@ def visualize_path_CV_2D(xrange, yrange, mesh, x_i, y_i, lam, contourvals=None, 
 
     # Compute s
     s = 1 / Npath * np.exp(logsumexp(-lam * ((x[np.newaxis, :] - x_i[:, np.newaxis]) ** 2 + (y[np.newaxis, :] - y_i[:, np.newaxis]) ** 2) + np.log(ivals)[:, np.newaxis], axis=0) 
-                                 - logsumexp(-lam * ((x[np.newaxis, :] - x_i[:, np.newaxis]) ** 2 + (y[np.newaxis, :] - y_i[:, np.newaxis]) ** 2), axis=0))
+                           - logsumexp(-lam * ((x[np.newaxis, :] - x_i[:, np.newaxis]) ** 2 + (y[np.newaxis, :] - y_i[:, np.newaxis]) ** 2), axis=0))
 
     # Compute z
     z = -1 / lam * logsumexp(-lam * ((x[np.newaxis, :] - x_i[:, np.newaxis]) ** 2 + (y[np.newaxis, :] - y_i[:, np.newaxis]) ** 2), axis=0)
