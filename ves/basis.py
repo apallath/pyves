@@ -279,7 +279,6 @@ class LegendreBasis2DRadialCV(torch.nn.Module):
             potential : torch.Scalar
                 The potential energy (in kJ/mol)
         """
-        # Compute string position
         x = positions[:, 0]
         y = positions[:, 1]
 
@@ -308,9 +307,9 @@ class LegendreBasis2DPathCV(torch.nn.Module):
     the point parallel to the path and perpendicular to the path respectively, 
     are computed as
 
-    $$s = \sum_{i=0}^{N-1} \frac{ 1 / (N - 1) \exp(-\lambda \sqrt{(x - x_i) ^ 2 + (y - y_i) ^ 2})}{\exp(-\lambda \sqrt{(x - x_i) ^ 2 + (y - y_i) ^ 2})}$$
+    $$s = \frac{1}{N - 1} \frac{\sum_{i=0}^{N-1} i\ e^{-\lambda [(x - x_i) ^ 2 + (y - y_i) ^ 2]}}{\sum_{i=0}^{N-1} e^{-\lambda [(x - x_i) ^ 2 + (y - y_i) ^ 2]}}$$
 
-    $$z = -\frac{1}{\lambda} \ln (\exp(-\lambda \sqrt{(x - x_i) ^ 2 + (y - y_i) ^ 2}))$$
+    $$z = -\frac{1}{\lambda} \ln (\sum_{i=0}^{N-1} e^{-\lambda [(x - x_i) ^ 2 + (y - y_i) ^ 2]})$$
 
     The CV $s$ is scaled to lie within [-1, 1] as
 
@@ -331,16 +330,18 @@ class LegendreBasis2DPathCV(torch.nn.Module):
 
     Attributes:
         degree (int): Degree of basis.
+        Npath (int): Number of images along the path.
         x_i (torch.DoubleTensor): x-coordinates of images along the path.
         y_i (torch.DoubleTensor): y-coordinates of images along the path.
-        gamma_i (torch.DoubleTensor): 
-        lam (float): Value of $\lambda$.
+        lam (float): Value of $\lambda$ (choose a sufficiently large value).
         weights (torch.nn.Parameter): Legendre polynomial coefficients of expansion along $s$ (array len = degree).
         kappa (torch.DoubleTensor): Strength of restraining harmonic potential along $z$.
     """
     def __init__(self, degree, x_i, y_i, gamma_i, lam, weights=None, kappa=0):
         super().__init__()
         self.degree = degree
+        assert(len(x_i) == len(y_i))
+        self.Npath = len(x_i)
         self.x_i = torch.from_numpy(x_i).type(torch.DoubleTensor)
         self.y_i = torch.from_numpy(y_i).type(torch.DoubleTensor)
         self.lam = lam
@@ -350,6 +351,8 @@ class LegendreBasis2DPathCV(torch.nn.Module):
         else:
             weights_tensor = torch.rand(degree).type(torch.DoubleTensor)
         self.weights = nn.Parameter(weights_tensor)
+
+        self.kappa = kappa
 
     @classmethod
     def legendre_polynomial(cls, x, degree: int) -> torch.Tensor:
@@ -390,12 +393,15 @@ class LegendreBasis2DPathCV(torch.nn.Module):
             potential : torch.Scalar
                 The potential energy (in kJ/mol)
         """
-        # Compute string position
         x = positions[:, 0]
         y = positions[:, 1]
 
         # Compute parallel distance OP s
-        s = torch.exp()
+        ivals = torch.arange(self.Npath).type(torch.DoubleTensor)
+        s = 1 / (self.Npath - 1) * torch.sum(ivals * torch.exp(-self.lam * ((x - self.x_i) ** 2 + (y - self.y_i) ** 2))) / torch.sum(torch.exp(-self.lam * ((x - self.x_i) ** 2 + (y - self.y_i) ** 2)))
+
+        # Compute perpendicular distance OP z
+        z = -1 / self.lam * torch.logsumexp(-self.lam * ((x - self.x_i) ** 2 + (y - self.y_i) ** 2))
 
         # Scale to [-1, 1]
         s = (s - 0.5) / 0.5
@@ -403,8 +409,12 @@ class LegendreBasis2DPathCV(torch.nn.Module):
         # Clamp to prevent s from going outside Legendre polynomial domain
         s = torch.clamp(s, min=-1, max=1)
 
-        # Apply legendre expansion bias
+        # Apply legendre expansion bias to s
         bias = torch.zeros_like(s)
         for i in range(self.degree):
             bias += self.weights[i] * self.legendre_polynomial(s, i)
+
+        # Apply harmonic bias to z
+        bias += self.kappa * z ** 2
+
         return bias

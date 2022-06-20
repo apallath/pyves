@@ -62,7 +62,7 @@ class NNBias(Bias):
 # Analytical biases
 ################################################################################
 
-# TODO: Implement
+# TODO: Implement analytical VES
 
 ################################################################################
 # Neural network biases

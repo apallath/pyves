@@ -2,6 +2,7 @@
 Classes for visualizing trajectory data.
 """
 import os
+from re import A
 
 import matplotlib
 import matplotlib.pyplot as plt
@@ -350,9 +351,75 @@ class VisualizePotential2D:
             os.system("ffmpeg -r 25 -i {}/traj_y.%5d.png -vb 20M {}/traj_y.mp4".format(outdir, outdir))
 
 
+def visualize_path_CV_2D(xrange, yrange, mesh, x_i, y_i, lam, contourvals=None, cmap='jet', dpi=150):
+    r"""
+    Plots the parallel (s) and perpendicular (z) path CVs for the path defined by the 
+    images (x_i, y_i) in the region defined by xrange and yrange.
+
+    $$s = \frac{1}{N} \frac{\sum_{i=0}^{N-1} (i + 1)\ e^{-\lambda [(x - x_i) ^ 2 + (y - y_i) ^ 2]}}{\sum_{i=0}^{N-1} e^{-\lambda [(x - x_i) ^ 2 + (y - y_i) ^ 2]}}$$
+
+    $$z = -\frac{1}{\lambda} \ln (\sum_{i=0}^{N-1} e^{-\lambda [(x - x_i) ^ 2 + (y - y_i) ^ 2]})$$
+
+    Args:
+        xrange (tuple of length 2): Range of x-values to plot.
+        yrange (tuple of length 2): Range of y-values to plot.
+        mesh: Number of mesh points in each dimension for contour plot.
+        x_i: x-coordinates of images defining a path.
+        y_i: y-coordinates of images defining a path.
+        lam: Value of $\lambda$ for constructing path CVs.
+        contourvals (int or array-like): Determines the number and positions of the contour lines / regions. Refer to the `matplotlib documentation`_ for details.
+        cmap: Matplotlib colormap (default=jet).
+        dpi: Output DPI (default=150).
+
+    Returns:
+        ((fig_s, ax_s), (fig_z, ax_z)): Figures and axes for each plot
+
+    .. _matplotlib documentation: https://matplotlib.org/3.5.1/api/_as_gen/matplotlib.pyplot.contour.html
+    """
+    xx, yy = np.meshgrid(np.linspace(xrange[0], xrange[1], mesh), np.linspace(yrange[0], yrange[1], mesh))
+    x = xx.ravel()
+    y = yy.ravel()
+
+    assert(len(x_i) == len(y_i))
+    ivals = np.arange(1, len(x_i) + 1)
+    Npath = len(ivals)
+
+    # Compute s
+    s = 1 / Npath * np.exp(logsumexp(-lam * ((x[np.newaxis, :] - x_i[:, np.newaxis]) ** 2 + (y[np.newaxis, :] - y_i[:, np.newaxis]) ** 2) + np.log(ivals)[:, np.newaxis], axis=0) 
+                                 - logsumexp(-lam * ((x[np.newaxis, :] - x_i[:, np.newaxis]) ** 2 + (y[np.newaxis, :] - y_i[:, np.newaxis]) ** 2), axis=0))
+
+    # Compute z
+    z = -1 / lam * logsumexp(-lam * ((x[np.newaxis, :] - x_i[:, np.newaxis]) ** 2 + (y[np.newaxis, :] - y_i[:, np.newaxis]) ** 2), axis=0)
+
+    # Plot s
+    fig_s, ax_s = plt.subplots(dpi=dpi)
+    if contourvals is not None:
+        cs_s = ax_s.contourf(xx, yy, s.reshape(mesh, mesh).clip(min=0, max=1), contourvals, cmap=cmap)
+    else:
+        cs_s = ax_s.contourf(xx, yy, s.reshape(mesh, mesh).clip(min=0, max=1), cmap=cmap)
+    cbar_s = fig_s.colorbar(cs_s)
+    cbar_s.set_label(r"s")
+    ax_s.set_xlabel("$x$")
+    ax_s.set_ylabel("$y$")
+
+    # Plot z
+    fig_z, ax_z = plt.subplots(dpi=dpi)
+    if contourvals is not None:
+        cs_z = ax_z.contourf(xx, yy, z.reshape(mesh, mesh), contourvals, cmap=cmap)
+    else:
+        cs_z = ax_z.contourf(xx, yy, z.reshape(mesh, mesh), cmap=cmap)
+    cbar_z = fig_z.colorbar(cs_z)
+    cbar_z.set_label(r"z")
+    ax_z.set_xlabel("$x$")
+    ax_z.set_ylabel("$y$")
+
+    return ((fig_s, ax_s), (fig_z, ax_z))
+
+
 def visualize_free_energy_2D(xvals, yvals, xrange, yrange, nbins_x=100, nbins_y=100, contourvals=None, clip=None, cmap='jet', dpi=150):
     """
     Plots 2D free energy profile from 2D trajectory data.
+
     Args:
         xvals (numpy.ndarray): Array of x coordinates of points to bin.
         yvals (numpy.ndarray): Array of y coordinates of points to bin.
@@ -364,6 +431,7 @@ def visualize_free_energy_2D(xvals, yvals, xrange, yrange, nbins_x=100, nbins_y=
         clip (float): Value of free energy (in kT) to clip contour plot at.
         cmap: Matplotlib colormap (default=jet).
         dpi: Output DPI (default=150).
+
     .. _matplotlib documentation: https://matplotlib.org/3.5.1/api/_as_gen/matplotlib.pyplot.contour.html
     """
     # Compute betaF
