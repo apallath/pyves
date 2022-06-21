@@ -73,7 +73,7 @@ if compute_string:
 
 else:
     mep = np.load("static_legendre_slip_bond_string_path_files/mep.npy")
-    F_mep = np.load("static_legendre_slip_bond_string_path_files/Fmep.npy")
+    Fmep = np.load("static_legendre_slip_bond_string_path_files/Fmep.npy")
 
 x_i = mep[:, 0]
 y_i = mep[:, 1]
@@ -85,7 +85,7 @@ y_i = mep[:, 1]
 ################################################################################
 # Begin:  Fit legendre basis set expansion to string
 ################################################################################
-fit_nn = False
+fit_nn = True
 
 if fit_nn:
     print("Fitting string using legendre model.")
@@ -98,7 +98,7 @@ if fit_nn:
     mep = torch.tensor(mep)
     Fmep = torch.tensor(Fmep)
 
-    nn_fn = LegendreBasis2DPathCV(8, x_i=x_i, y_i=y_i, lam=100, weights=None)
+    nn_fn = LegendreBasis2DPathCV(5, x_i=x_i, y_i=y_i, lam=100, weights=None)
 
     loss_fn = torch.nn.MSELoss()
     optimizer = torch.optim.Adam(nn_fn.parameters(), lr=1e-1)
@@ -166,7 +166,7 @@ else:
 vis = VisualizePotential2D(pot, temp=temp,
                            xrange=[-8, 10], yrange=[-6, 8],
                            contourvals=21, 
-                           bias=LegendreBasis2DPathCV(8, x_i=x_i, y_i=y_i, lam=100, weights=weights),
+                           bias=LegendreBasis2DPathCV(5, x_i=x_i, y_i=y_i, lam=100, weights=weights),
                            clip=20)
 
 # 2D surface
@@ -180,7 +180,7 @@ fig.savefig("static_legendre_slip_bond_string_path_files/biased_landscape.png")
 ################################################################################
 # Begin: Simulation
 ################################################################################
-run_sim = False
+run_sim = True
 
 if run_sim:
     # Monte carlo trials to place particle on potential energy surface
@@ -191,15 +191,15 @@ if run_sim:
     vis.scatter_traj(init_coord, "static_legendre_slip_bond_string_path_files/init_coord.png", biased=True, c='white', s=2)
 
     # Perform single particle simulation
-    sim = SingleParticleSimulation(pot, temp=temp, init_coord=init_coord, cpu_threads=1)
+    sim = SingleParticleSimulation(pot, temp=temp, init_coord=init_coord, cpu_threads=1, traj_in_mem=False)
 
     # Begin: Initialize static bias
-    V_module = LegendreBasis2DPathCV(8, x_i=x_i, y_i=y_i, lam=100, weights=weights)
+    V_module = LegendreBasis2DPathCV(5, x_i=x_i, y_i=y_i, lam=100, weights=weights)
     ves_bias = StaticBias_SingleParticle(V_module, model_loc="static_legendre_slip_bond_string_path_files/model.pt")
     sim.init_ves(ves_bias, static=True, startafter=500)
 
     # Call simulation
-    sim(nsteps=200000,  # run 2ns simulation
+    sim(nsteps=10 * 100000,  # run x ns simulation
         chkevery=10000,
         trajevery=1,
         energyevery=1,
@@ -218,22 +218,24 @@ t, traj = TrajectoryReader("static_legendre_slip_bond_string_path_files/traj.dat
 
 # Uncomment the following lines to plot trajectores:
 vis.scatter_traj(traj, "static_legendre_slip_bond_string_path_files/traj.png", c='white', every=50, biased=True)
-vis.scatter_traj_projection_x(traj, "static_legendre_slip_bond_string_path_files/traj_x.png", c='white', every=50, biased=True)
-vis.scatter_traj_projection_y(traj, "static_legendre_slip_bond_string_path_files/traj_y.png", c='white', every=50, biased=True)
+vis.scatter_traj_projection_x(traj, "static_legendre_slip_bond_string_path_files/traj_x.png", every=50, biased=True)
+vis.scatter_traj_projection_y(traj, "static_legendre_slip_bond_string_path_files/traj_y.png", every=50, biased=True)
 
 # Uncomment the following lines to animate trajectores:
 #vis.animate_traj(traj, "static_legendre_slip_bond_string_path_files/traj_movie", c='white', s=2, every=200, biased=True)
-#vis.animate_traj_projection_x(traj, "static_legendre_slip_bond_string_path_files/traj_movie", c='white', s=2, every=200, biased=True)
-#vis.animate_traj_projection_y(traj, "static_legendre_slip_bond_string_path_files/traj_movie", c='white', s=2, every=200, biased=True)
+#vis.animate_traj_projection_x(traj, "static_legendre_slip_bond_string_path_files/traj_movie", every=200, biased=True)
+#vis.animate_traj_projection_y(traj, "static_legendre_slip_bond_string_path_files/traj_movie", every=200, biased=True)
 
 fig, ax = plt.subplots(dpi=300)
 ax.plot(t, traj[:, 0])
+ax.set_ylim([-10, 12])
 ax.set_xlabel("t")
 ax.set_ylabel("x")
 fig.savefig("static_legendre_slip_bond_string_path_files/ts_x.png")
 
 fig, ax = plt.subplots(dpi=300)
 ax.plot(t, traj[:, 1])
+ax.set_ylim([-8, 10])
 ax.set_xlabel("t")
 ax.set_ylabel("y")
 fig.savefig("static_legendre_slip_bond_string_path_files/ts_y.png")

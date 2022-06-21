@@ -379,7 +379,7 @@ class LegendreBasis2DRadialCV(torch.nn.Module):
         # for i in range(self.degree):
         #     bias += self.weights[i] * self.legendre_polynomial(s, i)
 
-        bias = self.legendre_polynomial_expansion(x, self.degree, self.weights)
+        bias = self.legendre_polynomial_expansion(s, self.degree, self.weights)
         return bias
 
 
@@ -540,7 +540,7 @@ class LegendreBasis2DPathCV(torch.nn.Module):
         # for i in range(self.degree):
         #     bias += self.weights[i] * self.legendre_polynomial(s, i)
 
-        bias = self.legendre_polynomial_expansion(x, self.degree, self.weights)
+        bias = self.legendre_polynomial_expansion(s, self.degree, self.weights)
 
         # Apply harmonic bias to z
         bias += self.phi * z

@@ -22,7 +22,7 @@ class SingleParticleSimulation:
                  potential: openmm.CustomExternalForce,
                  mass: int = 1,
                  temp: float = 300,
-                 friction: float = 100,
+                 friction: float = 20,
                  timestep: float = 10,
                  init_state: openmm.State = None,
                  init_coord: np.ndarray = np.array([0, 0, 0]).reshape((1, 3)),

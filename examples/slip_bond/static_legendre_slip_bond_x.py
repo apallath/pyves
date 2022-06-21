@@ -42,7 +42,7 @@ if fit_nn:
 
     x = torch.tensor(x).unsqueeze(-1)
     Fx = torch.tensor(Fx)
-    nn_fn = LegendreBasis1D(12, min=-3, max=6, axis='x', weights=None)
+    nn_fn = LegendreBasis1D(8, min=-3, max=6, axis='x', weights=None)
 
     loss_fn = torch.nn.MSELoss()
     optimizer = torch.optim.Adam(nn_fn.parameters(), lr=1e-1)
@@ -109,7 +109,7 @@ else:
 vis = VisualizePotential2D(pot, temp=temp,
                            xrange=[-8, 10], yrange=[-6, 8],
                            contourvals=21, 
-                           bias=LegendreBasis1D(12, min=-3, max=6, axis='x', weights=weights),
+                           bias=LegendreBasis1D(8, min=-3, max=6, axis='x', weights=weights),
                            clip=20)
 
 # 2D surface
@@ -147,15 +147,15 @@ if run_sim:
     vis.scatter_traj(init_coord, "static_legendre_slip_bond_x_files/init_coord.png", biased=True, c='white', s=2)
 
     # Perform single particle simulation
-    sim = SingleParticleSimulation(pot, temp=temp, init_coord=init_coord, cpu_threads=1)
+    sim = SingleParticleSimulation(pot, temp=temp, init_coord=init_coord, cpu_threads=1, traj_in_mem=False)
 
     # Begin: Initialize static bias
-    V_module = LegendreBasis1D(12, min=-3, max=6, axis='x', weights=weights)
+    V_module = LegendreBasis1D(8, min=-3, max=6, axis='x', weights=weights)
     ves_bias = StaticBias_SingleParticle(V_module, model_loc="static_legendre_slip_bond_x_files/model.pt")
     sim.init_ves(ves_bias, static=True, startafter=500)
 
     # Call simulation
-    sim(nsteps=200000,  # run 2ns simulation
+    sim(nsteps=10 * 100000,  # run x ns simulation
         chkevery=10000,
         trajevery=1,
         energyevery=1,
@@ -174,22 +174,24 @@ t, traj = TrajectoryReader("static_legendre_slip_bond_x_files/traj.dat").read_tr
 
 # Uncomment the following lines to plot trajectores:
 vis.scatter_traj(traj, "static_legendre_slip_bond_x_files/traj.png",  c='white', every=50, biased=True)
-vis.scatter_traj_projection_x(traj, "static_legendre_slip_bond_x_files/traj_x.png",  c='white', every=50, biased=True)
-vis.scatter_traj_projection_y(traj, "static_legendre_slip_bond_x_files/traj_y.png",  c='white', every=50, biased=True)
+vis.scatter_traj_projection_x(traj, "static_legendre_slip_bond_x_files/traj_x.png",  every=50, biased=True)
+vis.scatter_traj_projection_y(traj, "static_legendre_slip_bond_x_files/traj_y.png",  every=50, biased=True)
 
 # Uncomment the following lines to animate trajectores:
 #vis.animate_traj(traj, "static_legendre_slip_bond_x_files/traj_movie", c='white', s=2, every=200, biased=True)
-#vis.animate_traj_projection_x(traj, "static_legendre_slip_bond_x_files/traj_movie", c='white', s=2, every=200, biased=True)
-#vis.animate_traj_projection_y(traj, "static_legendre_slip_bond_x_files/traj_movie", c='white', s=2, every=200, biased=True)
+#vis.animate_traj_projection_x(traj, "static_legendre_slip_bond_x_files/traj_movie", every=200, biased=True)
+#vis.animate_traj_projection_y(traj, "static_legendre_slip_bond_x_files/traj_movie", every=200, biased=True)
 
 fig, ax = plt.subplots(dpi=300)
 ax.plot(t, traj[:, 0])
+ax.set_ylim([-10, 12])
 ax.set_xlabel("t")
 ax.set_ylabel("x")
 fig.savefig("static_legendre_slip_bond_x_files/ts_x.png")
 
 fig, ax = plt.subplots(dpi=300)
 ax.plot(t, traj[:, 1])
+ax.set_ylim([-8, 10])
 ax.set_xlabel("t")
 ax.set_ylabel("y")
 fig.savefig("static_legendre_slip_bond_x_files/ts_y.png")

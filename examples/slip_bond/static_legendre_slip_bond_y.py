@@ -146,7 +146,7 @@ if run_sim:
     vis.scatter_traj(init_coord, "static_legendre_slip_bond_y_files/init_coord.png", biased=True, c='white', s=2)
 
     # Perform single particle simulation
-    sim = SingleParticleSimulation(pot, temp=temp, init_coord=init_coord, cpu_threads=1)
+    sim = SingleParticleSimulation(pot, temp=temp, init_coord=init_coord, cpu_threads=1, traj_in_mem=False)
 
     # Begin: Initialize static bias
     V_module = LegendreBasis1D(5, min=-4, max=6, axis='y', weights=weights)
@@ -154,7 +154,7 @@ if run_sim:
     sim.init_ves(ves_bias, static=True, startafter=500)
 
     # Call simulation
-    sim(nsteps=200000,  # run 2ns simulation
+    sim(nsteps=10 * 100000,  # run x ns simulation
         chkevery=10000,
         trajevery=1,
         energyevery=1,
@@ -173,22 +173,24 @@ t, traj = TrajectoryReader("static_legendre_slip_bond_y_files/traj.dat").read_tr
 
 # Uncomment the following lines to plot trajectores:
 vis.scatter_traj(traj, "static_legendre_slip_bond_y_files/traj.png",  c='white', every=50, biased=True)
-vis.scatter_traj_projection_x(traj, "static_legendre_slip_bond_y_files/traj_x.png",  c='white', every=50, biased=True)
-vis.scatter_traj_projection_y(traj, "static_legendre_slip_bond_y_files/traj_y.png",  c='white', every=50, biased=True)
+vis.scatter_traj_projection_x(traj, "static_legendre_slip_bond_y_files/traj_x.png",  every=50, biased=True)
+vis.scatter_traj_projection_y(traj, "static_legendre_slip_bond_y_files/traj_y.png",  every=50, biased=True)
 
 # Uncomment the following lines to animate trajectores:
 #vis.animate_traj(traj, "static_legendre_slip_bond_y_files/traj_movie", c='white', s=2, every=200, biased=True)
-#vis.animate_traj_projection_x(traj, "static_legendre_slip_bond_y_files/traj_movie", c='white', s=2, every=200, biased=True)
-#vis.animate_traj_projection_y(traj, "static_legendre_slip_bond_y_files/traj_movie", c='white', s=2, every=200, biased=True)
+#vis.animate_traj_projection_x(traj, "static_legendre_slip_bond_y_files/traj_movie", every=200, biased=True)
+#vis.animate_traj_projection_y(traj, "static_legendre_slip_bond_y_files/traj_movie", every=200, biased=True)
 
 fig, ax = plt.subplots(dpi=300)
 ax.plot(t, traj[:, 0])
+ax.set_ylim([-10, 12])
 ax.set_xlabel("t")
 ax.set_ylabel("x")
 fig.savefig("static_legendre_slip_bond_y_files/ts_x.png")
 
 fig, ax = plt.subplots(dpi=300)
 ax.plot(t, traj[:, 1])
+ax.set_ylim([-8, 10])
 ax.set_xlabel("t")
 ax.set_ylabel("y")
 fig.savefig("static_legendre_slip_bond_y_files/ts_y.png")
