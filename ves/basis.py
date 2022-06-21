@@ -4,6 +4,7 @@ Classes defining basis expansions.
 import torch
 import torch.nn as nn
 
+from deprecated import deprecated
 
 torch.set_default_tensor_type(torch.DoubleTensor)
 
@@ -37,7 +38,7 @@ class LegendreBasis1D(torch.nn.Module):
         min (float): Min x-/y-value for scaling.
         max (float): Max x-/y-value for scaling.
         axis (str): 'x' or 'y' (default='x').
-        weights (torch.nn.Parameter): Legendre polynomial coefficients (array len = degree).
+        weights (torch.nn.Parameter): Legendre polynomial coefficients (array len = degree + 1).
     """
     def __init__(self, degree, min, max, axis='x', weights=None):
         super().__init__()
@@ -49,10 +50,12 @@ class LegendreBasis1D(torch.nn.Module):
         if weights is not None:
             weights_tensor = torch.from_numpy(weights).type(torch.DoubleTensor)
         else:
-            weights_tensor = torch.rand(degree).type(torch.DoubleTensor)
+            weights_tensor = torch.rand(degree + 1).type(torch.DoubleTensor)
         self.weights = nn.Parameter(weights_tensor)
 
     @classmethod
+    @deprecated("""Use this method only if you need to compute a single Legendre polynomial. 
+    If you need to compute a Legendre basis expansion, use legendre_polynomial_expansion instead""")
     def legendre_polynomial(cls, x, degree: int) -> torch.Tensor:
         r"""
         Computes a legendre polynomial of degree $n$ using dynamic programming
@@ -79,6 +82,43 @@ class LegendreBasis1D(torch.nn.Module):
                 P_n_minus = P_n
                 P_n = P_n_plus
             return P_n
+
+    @classmethod
+    def legendre_polynomial_expansion(cls, x, degree: int, weights: torch.Tensor) -> torch.Tensor:
+        r"""
+        Computes a legendre polynomial expansion of degree $d$ using dynamic programming
+        and the Bonnet's recursion formula:
+
+        $$(n + 1) P_{n+1}(x) = (2n + 1) x P_n(x) - nP_{n-1}(x)$$
+
+        $$y = \sum_{n=1}^{d} w_n P_n(x)$$
+
+        Important:
+            `weights` must be of length (`degree` + 1).
+        """
+        ones_list = x.size(0) * [1.0]
+        P_n_minus = torch.tensor(ones_list, requires_grad=True).type(x.type())
+
+        out = weights[0] * P_n_minus
+        if degree == 0:
+            return out
+
+        P_n = x
+        out += weights[1] * P_n
+        if degree == 1:
+            return out
+
+        for n in range(1, degree):
+            P_n_plus = ((2 * n + 1) * x * P_n - n * P_n_minus) / (n + 1)
+
+            # Replace
+            P_n_minus = P_n
+            P_n = P_n_plus
+
+            # Add to expansion
+            out += weights[n + 1] * P_n
+
+        return out
 
     def forward(self, positions):
         """The forward method returns the energy computed from positions.
@@ -107,9 +147,12 @@ class LegendreBasis1D(torch.nn.Module):
         x = torch.clamp(x, min=-1, max=1)
 
         # Apply legendre expansion bias
-        bias = torch.zeros_like(x)
-        for i in range(self.degree):
-            bias += self.weights[i] * self.legendre_polynomial(x, i)
+
+        # bias = torch.zeros_like(x)
+        # for i in range(self.degree + 1):
+        #     bias += self.weights[i] * self.legendre_polynomial(x, i)
+
+        bias = self.legendre_polynomial_expansion(x, self.degree, self.weights)
         return bias
 
 
@@ -193,7 +236,7 @@ class NNBasis1D(nn.Module):
 # Basis expansions along a 1-dimensional CV in 2D space
 ################################################################################
 
-
+@deprecated("Use LegendreBasis2DPathCV instead.")
 class LegendreBasis2DRadialCV(torch.nn.Module):
     r"""
     Legendre polynomial basis expansion along a radial collective variable (CV) defined in the neighborhood
@@ -224,7 +267,7 @@ class LegendreBasis2DRadialCV(torch.nn.Module):
         y_min (float): Start y-coordinate.
         x_max (float): End x-coordinate.
         y_max (float): End y-coordinate.
-        weights (torch.nn.Parameter): Legendre polynomial coefficients (array len = degree).
+        weights (torch.nn.Parameter): Legendre polynomial coefficients (array len = degree + 1).
     """
     def __init__(self, degree, x_min, y_min, x_max, y_max, weights=None):
         super().__init__()
@@ -237,10 +280,12 @@ class LegendreBasis2DRadialCV(torch.nn.Module):
         if weights is not None:
             weights_tensor = torch.from_numpy(weights).type(torch.DoubleTensor)
         else:
-            weights_tensor = torch.rand(degree).type(torch.DoubleTensor)
+            weights_tensor = torch.rand(degree + 1).type(torch.DoubleTensor)
         self.weights = nn.Parameter(weights_tensor)
 
     @classmethod
+    @deprecated("""Use this method only if you need to compute a single Legendre polynomial. 
+    If you need to compute a Legendre basis expansion, use legendre_polynomial_expansion instead""")
     def legendre_polynomial(cls, x, degree: int) -> torch.Tensor:
         r"""
         Computes a legendre polynomial of degree $n$ using dynamic programming
@@ -268,6 +313,43 @@ class LegendreBasis2DRadialCV(torch.nn.Module):
                 P_n = P_n_plus
             return P_n
 
+    @classmethod
+    def legendre_polynomial_expansion(cls, x, degree: int, weights: torch.Tensor) -> torch.Tensor:
+        r"""
+        Computes a legendre polynomial expansion of degree $d$ using dynamic programming
+        and the Bonnet's recursion formula:
+
+        $$(n + 1) P_{n+1}(x) = (2n + 1) x P_n(x) - nP_{n-1}(x)$$
+
+        $$y = \sum_{n=1}^{d} w_n P_n(x)$$
+
+        Important:
+            `weights` must be of length (`degree` + 1).
+        """
+        ones_list = x.size(0) * [1.0]
+        P_n_minus = torch.tensor(ones_list, requires_grad=True).type(x.type())
+
+        out = weights[0] * P_n_minus
+        if degree == 0:
+            return out
+
+        P_n = x
+        out += weights[1] * P_n
+        if degree == 1:
+            return out
+
+        for n in range(1, degree):
+            P_n_plus = ((2 * n + 1) * x * P_n - n * P_n_minus) / (n + 1)
+
+            # Replace
+            P_n_minus = P_n
+            P_n = P_n_plus
+
+            # Add to expansion
+            out += weights[n + 1] * P_n
+
+        return out
+
     def forward(self, positions):
         """The forward method returns the energy computed from positions.
 
@@ -292,9 +374,12 @@ class LegendreBasis2DRadialCV(torch.nn.Module):
         s = torch.clamp(s, min=-1, max=1)
 
         # Apply legendre expansion bias
-        bias = torch.zeros_like(s)
-        for i in range(self.degree):
-            bias += self.weights[i] * self.legendre_polynomial(s, i)
+        
+        # bias = torch.zeros_like(s)
+        # for i in range(self.degree):
+        #     bias += self.weights[i] * self.legendre_polynomial(s, i)
+
+        bias = self.legendre_polynomial_expansion(x, self.degree, self.weights)
         return bias
 
 
@@ -334,7 +419,7 @@ class LegendreBasis2DPathCV(torch.nn.Module):
         x_i (torch.DoubleTensor): x-coordinates of images along the path.
         y_i (torch.DoubleTensor): y-coordinates of images along the path.
         lam (float): Value of $\lambda$ (choose a sufficiently large value).
-        weights (torch.nn.Parameter): Legendre polynomial coefficients of expansion along $s$ (array len = degree).
+        weights (torch.nn.Parameter): Legendre polynomial coefficients of expansion along $s$ (array len = degree + 1).
         phi (torch.DoubleTensor): Strength of restraining potential along $z$.
     """
     def __init__(self, degree, x_i, y_i, lam, weights=None, phi=0):
@@ -349,12 +434,14 @@ class LegendreBasis2DPathCV(torch.nn.Module):
         if weights is not None:
             weights_tensor = torch.from_numpy(weights).type(torch.DoubleTensor)
         else:
-            weights_tensor = torch.rand(degree).type(torch.DoubleTensor)
+            weights_tensor = torch.rand(degree + 1).type(torch.DoubleTensor)
         self.weights = nn.Parameter(weights_tensor)
 
         self.phi = phi
 
     @classmethod
+    @deprecated("""Use this method only if you need to compute a single Legendre polynomial. 
+    If you need to compute a Legendre basis expansion, use legendre_polynomial_expansion instead""")
     def legendre_polynomial(cls, x, degree: int) -> torch.Tensor:
         r"""
         Computes a legendre polynomial of degree $n$ using dynamic programming
@@ -381,6 +468,43 @@ class LegendreBasis2DPathCV(torch.nn.Module):
                 P_n_minus = P_n
                 P_n = P_n_plus
             return P_n
+
+    @classmethod
+    def legendre_polynomial_expansion(cls, x, degree: int, weights: torch.Tensor) -> torch.Tensor:
+        r"""
+        Computes a legendre polynomial expansion of degree $d$ using dynamic programming
+        and the Bonnet's recursion formula:
+
+        $$(n + 1) P_{n+1}(x) = (2n + 1) x P_n(x) - nP_{n-1}(x)$$
+
+        $$y = \sum_{n=1}^{d} w_n P_n(x)$$
+
+        Important:
+            `weights` must be of length (`degree` + 1).
+        """
+        ones_list = x.size(0) * [1.0]
+        P_n_minus = torch.tensor(ones_list, requires_grad=True).type(x.type())
+
+        out = weights[0] * P_n_minus
+        if degree == 0:
+            return out
+
+        P_n = x
+        out += weights[1] * P_n
+        if degree == 1:
+            return out
+
+        for n in range(1, degree):
+            P_n_plus = ((2 * n + 1) * x * P_n - n * P_n_minus) / (n + 1)
+
+            # Replace
+            P_n_minus = P_n
+            P_n = P_n_plus
+
+            # Add to expansion
+            out += weights[n + 1] * P_n
+
+        return out
 
     def forward(self, positions):
         """The forward method returns the energy computed from positions.
@@ -411,9 +535,12 @@ class LegendreBasis2DPathCV(torch.nn.Module):
         s = torch.clamp(s, min=-1, max=1)
 
         # Apply legendre expansion bias to s
-        bias = torch.zeros_like(s)
-        for i in range(self.degree):
-            bias += self.weights[i] * self.legendre_polynomial(s, i)
+
+        # bias = torch.zeros_like(s)
+        # for i in range(self.degree):
+        #     bias += self.weights[i] * self.legendre_polynomial(s, i)
+
+        bias = self.legendre_polynomial_expansion(x, self.degree, self.weights)
 
         # Apply harmonic bias to z
         bias += self.phi * z
