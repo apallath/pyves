@@ -34,7 +34,7 @@ plt.close('all')
 ################################################################################
 # Begin: Simulation
 ################################################################################
-run_sim = False
+run_sim = True
 
 if run_sim:
     # Monte carlo trials to place particle on potential energy surface
@@ -48,7 +48,7 @@ if run_sim:
     sim = SingleParticleSimulation(pot, temp=temp, init_coord=init_coord, cpu_threads=1, traj_in_mem=False)
 
     sim(nsteps=10 * 100000,  # run x ns simulation
-        chkevery=10000,
+        chkevery=5 * 10000,
         trajevery=1,
         energyevery=1,
         chkfile="unbiased_slip_bond_files/chk_state.dat",

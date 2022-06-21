@@ -10,30 +10,29 @@ from tqdm import tqdm
 # Install this from github.com/apallath/stringmethod
 import stringmethod
 
-from ves.basis import LegendreBasis2DPathCV
+from ves.basis import LegendreBasis2DRadialCV
 from ves.bias import StaticBias_SingleParticle
 from ves.config_creation import singleParticle2D_init_coord
 from ves.langevin_dynamics import SingleParticleSimulation
-from ves.visualization import VisualizePotential2D, visualize_path_CV_2D
+from ves.visualization import VisualizePotential2D
 from ves.potentials import SlipBondPotential2D
 from ves.utils import TrajectoryReader
 
 
-if not os.path.exists("static_legendre_slip_bond_string_path_files/"):
-    os.makedirs("static_legendre_slip_bond_string_path_files/")
+if not os.path.exists("static_legendre_slip_bond_string_radial_files/"):
+    os.makedirs("static_legendre_slip_bond_string_radial_files/")
 
 # Create and visualize potential energy surface
 pot = SlipBondPotential2D()
 temp = 300
 
 ################################################################################
-# Begin: Compute string and plot path CVs
+# Begin:  Fit legendre basis set expansion to string
 ################################################################################
-compute_string = True
+fit_nn = True
 
-if compute_string:
+if fit_nn:
     print("Computing string.")
-
     # Compute string
     x = np.linspace(-8, 10, 100)
     y = np.linspace(-6, 8, 100)
@@ -45,42 +44,31 @@ if compute_string:
 
     # Plot
     fig, ax, cbar = S.plot_string_evolution(clip_max=20, levels=21, cmap='jet')
-    fig.savefig("static_legendre_slip_bond_string_path_files/string_evolution.png")
-
+    fig.savefig("static_legendre_slip_bond_string_radial_files/string_evolution.png")
     fig, ax = S.plot_mep_energy_profile()
-    fig.savefig("static_legendre_slip_bond_string_path_files/string_energy_profile.png")
+    fig.savefig("static_legendre_slip_bond_string_radial_files/string_energy_profile.png")
 
     # Get string coordinates and corresponding energies
     mep, Fmep = S.get_mep_energy_profile()
 
-    # Plot Path CVs along mep
-    ((fig_s, ax_s), (fig_z, ax_z)) = visualize_path_CV_2D(xrange=(-8, 10), yrange=(-8, 10), mesh=100, x_i=mep[:, 0], y_i=mep[:, 1], lam=500, contourvals=50, dpi=300, cmap="RdYlBu")
-    ax_s.plot(mep[:, 0], mep[:, 1], color='white')
-    fig_s.savefig("static_legendre_slip_bond_string_path_files/path_s.png")
-    ax_z.plot(mep[:, 0], mep[:, 1], color='white')
-    fig_z.savefig("static_legendre_slip_bond_string_path_files/path_z.png")
+    # Reparameterize mep
+    x_min = mep[0, 0]
+    y_min = mep[0, 1]
+    x_max = mep[-1, 0]
+    y_max = mep[-1, 1]
 
-    # Save string
-    np.save("static_legendre_slip_bond_string_path_files/mep.npy", mep)
-    np.save("static_legendre_slip_bond_string_path_files/Fmep.npy", Fmep)
+    # Get s for each point
+    s = np.zeros_like(Fmep)
+    for ptidx in range(len(mep)):
+        pt = mep[ptidx]
+        s[ptidx] = ((pt[0] - x_min) ** 2 + (pt[1] - y_min) ** 2) / ((x_max - x_min) ** 2 + (y_max - y_min) ** 2)
 
-else:
-    mep = np.load("static_legendre_slip_bond_string_path_files/mep.npy")
-    Fmep = np.load("static_legendre_slip_bond_string_path_files/Fmep.npy")
+    s = (s - 0.5) / 0.5
 
-x_i = mep[:, 0]
-y_i = mep[:, 1]
+    fig, ax = plt.subplots(dpi=300)
+    ax.plot(s, Fmep)
+    fig.savefig("static_legendre_slip_bond_string_radial_files/string_energy_profile_reparam_s.png")
 
-################################################################################
-# End: Compute string and plot path CVs
-################################################################################
-
-################################################################################
-# Begin:  Fit legendre basis set expansion to string
-################################################################################
-fit_nn = True
-
-if fit_nn:
     print("Fitting string using legendre model.")
 
     # V(s) = -F(s), not -beta F(s)
@@ -90,8 +78,7 @@ if fit_nn:
 
     mep = torch.tensor(mep)
     Fmep = torch.tensor(Fmep)
-
-    nn_fn = LegendreBasis2DPathCV(8, x_i=x_i, y_i=y_i, lam=100, weights=None)
+    nn_fn = LegendreBasis2DRadialCV(8, x_min=x_min, y_min=y_min, x_max=x_max, y_max=y_max, weights=None)
 
     loss_fn = torch.nn.MSELoss()
     optimizer = torch.optim.Adam(nn_fn.parameters(), lr=1e-1)
@@ -118,20 +105,20 @@ if fit_nn:
 
     # 1D projection fit
     fig, ax = plt.subplots(dpi=300)
-    ax.plot(np.linspace(0, 1, len(mep)), Fmep, label="Orig")
+    ax.plot(s, Fmep, label="Orig")
     fit_np = nn_fn(mep).detach().numpy()
-    ax.plot(np.linspace(0, 1, len(mep)), fit_np, label="Legendre fit")
+    ax.plot(s, fit_np, label="Legendre fit")
     ax.set_xlabel("s")
     ax.set_ylabel("V(s)")
     ax.legend()
-    plt.savefig("static_legendre_slip_bond_string_path_files/potential_s_legendrefit.png")
+    plt.savefig("static_legendre_slip_bond_string_radial_files/potential_s_legendrefit.png")
     plt.close()
 
     fig, ax = plt.subplots(dpi=300)
     ax.plot(range(len(losses)), losses)
     ax.set_xlabel("Iteration")
     ax.set_ylabel("MSE loss")
-    plt.savefig("static_legendre_slip_bond_string_path_files/legendrefit_loss_history.png")
+    plt.savefig("static_legendre_slip_bond_string_radial_files/legendrefit_loss_history.png")
     plt.close()
 
     # Extract weights
@@ -140,13 +127,20 @@ if fit_nn:
     weights = -weights
 
     # Print
+    print(x_min, y_min, x_max, y_max)
     print(weights)
-    
+
     # Save weights
-    np.save("static_legendre_slip_bond_string_path_files/weights.npy", weights)
+    np.save("static_legendre_slip_bond_string_radial_files/minmax.npy", np.array([x_min, y_min, x_max, y_max]))
+    np.save("static_legendre_slip_bond_string_radial_files/weights.npy", weights)
 
 else:
-    weights = np.load("static_legendre_slip_bond_string_path_files/weights.npy")
+    minmax = np.load("static_legendre_slip_bond_string_radial_files/minmax.npy")
+    x_min = minmax[0]
+    y_min = minmax[1]
+    x_max = minmax[2]
+    y_max = minmax[3]
+    weights = np.load("static_legendre_slip_bond_string_radial_files/weights.npy")
 
 ################################################################################
 # End: Fit legendre basis set expansion to string
@@ -159,25 +153,25 @@ else:
 vis = VisualizePotential2D(pot, temp=temp,
                            xrange=[-8, 10], yrange=[-6, 8],
                            contourvals=21, 
-                           bias=LegendreBasis2DPathCV(8, x_i=x_i, y_i=y_i, lam=100, weights=weights),
+                           bias=LegendreBasis2DRadialCV(8, x_min=x_min, y_min=y_min, x_max=x_max, y_max=y_max, weights=weights),
                            clip=20)
 
 # 2D surface
 fig, ax = vis.plot_potential()
-fig.savefig("static_legendre_slip_bond_string_path_files/potential.png")
+fig.savefig("static_legendre_slip_bond_string_radial_files/potential.png")
 fig, ax = vis.plot_potential(biased=True)
-fig.savefig("static_legendre_slip_bond_string_path_files/potential_biased.png")
+fig.savefig("static_legendre_slip_bond_string_radial_files/potential_biased.png")
 
 # 1D projection along x
 fig, ax, _, _ = vis.plot_projection_x()
-fig.savefig("static_legendre_slip_bond_string_path_files/potential_x.png")
+fig.savefig("static_legendre_slip_bond_string_radial_files/potential_x.png")
 fig, ax, _, _ = vis.plot_projection_x(biased=True)
-fig.savefig("static_legendre_slip_bond_string_path_files/potential_x_biased.png")
+fig.savefig("static_legendre_slip_bond_string_radial_files/potential_x_biased.png")
 
 fig, ax, _, _ = vis.plot_projection_y()
-fig.savefig("static_legendre_slip_bond_string_path_files/potential_y.png")
+fig.savefig("static_legendre_slip_bond_string_radial_files/potential_y.png")
 fig, ax, _, _ = vis.plot_projection_y(biased=True)
-fig.savefig("static_legendre_slip_bond_string_path_files/potential_y_biased.png")
+fig.savefig("static_legendre_slip_bond_string_radial_files/potential_y_biased.png")
 
 ################################################################################
 # End: Plot biased landscape
@@ -192,16 +186,16 @@ if run_sim:
     # Monte carlo trials to place particle on potential energy surface
     init_coord = singleParticle2D_init_coord(pot, temp, xmin=-8, xmax=10,
                                              ymin=-6, ymax=8)
-    
+
     # Plot initial coordinate
-    vis.scatter_traj(init_coord, "static_legendre_slip_bond_string_path_files/init_coord.png", biased=True, c='white', s=2)
+    vis.scatter_traj(init_coord, "static_legendre_slip_bond_string_radial_files/init_coord.png", biased=True, c='white', s=2)
 
     # Perform single particle simulation
     sim = SingleParticleSimulation(pot, temp=temp, init_coord=init_coord, cpu_threads=1, traj_in_mem=False)
 
     # Begin: Initialize static bias
-    V_module = LegendreBasis2DPathCV(8, x_i=x_i, y_i=y_i, lam=100, weights=weights)
-    ves_bias = StaticBias_SingleParticle(V_module, model_loc="static_legendre_slip_bond_string_path_files/model.pt")
+    V_module = LegendreBasis2DRadialCV(8, x_min=x_min, y_min=y_min, x_max=x_max, y_max=y_max, weights=weights)
+    ves_bias = StaticBias_SingleParticle(V_module, model_loc="static_legendre_slip_bond_string_radial_files/model.pt")
     sim.init_ves(ves_bias, static=True, startafter=500)
 
     # Call simulation
@@ -209,41 +203,39 @@ if run_sim:
         chkevery=5 * 10000,
         trajevery=1,
         energyevery=1,
-        chkfile="static_legendre_slip_bond_string_path_files/chk_state.dat",
-        trajfile="static_legendre_slip_bond_string_path_files/traj.dat",
-        energyfile="static_legendre_slip_bond_string_path_files/energies.dat")
+        chkfile="static_legendre_slip_bond_string_radial_files/chk_state.dat",
+        trajfile="static_legendre_slip_bond_string_radial_files/traj.dat",
+        energyfile="static_legendre_slip_bond_string_radial_files/energies.dat")
 
 ################################################################################
 # End: Simulation
 ################################################################################
 
 ################################################################################
-# Begin: Plot traj and timeseries
+# Begin: Plot timeseries & trajectories
 ################################################################################
-t, traj = TrajectoryReader("static_legendre_slip_bond_string_path_files/traj.dat").read_traj()
+t, traj = TrajectoryReader("static_legendre_slip_bond_string_radial_files/traj.dat").read_traj()
 
 # Uncomment the following lines to plot trajectores:
-vis.scatter_traj(traj, "static_legendre_slip_bond_string_path_files/traj.png", c='white', every=50, biased=True)
-vis.scatter_traj_projection_x(traj, "static_legendre_slip_bond_string_path_files/traj_x.png", every=50, biased=True)
-vis.scatter_traj_projection_y(traj, "static_legendre_slip_bond_string_path_files/traj_y.png", every=50, biased=True)
+vis.scatter_traj(traj, "static_legendre_slip_bond_string_radial_files/traj.png", c='white', every=50, biased=True)
+vis.scatter_traj_projection_x(traj, "static_legendre_slip_bond_string_radial_files/traj_x.png", every=50, biased=True)
+vis.scatter_traj_projection_y(traj, "static_legendre_slip_bond_string_radial_files/traj_y.png", every=50, biased=True)
 
 # Uncomment the following lines to animate trajectores:
-#vis.animate_traj(traj, "static_legendre_slip_bond_string_path_files/traj_movie", c='white', s=2, every=200, biased=True)
-#vis.animate_traj_projection_x(traj, "static_legendre_slip_bond_string_path_files/traj_movie", every=200, biased=True)
-#vis.animate_traj_projection_y(traj, "static_legendre_slip_bond_string_path_files/traj_movie", every=200, biased=True)
+#vis.animate_traj(traj, "static_legendre_slip_bond_string_radial_files/traj_movie", c='white', s=2, every=200, biased=True)
+#vis.animate_traj_projection_x(traj, "static_legendre_slip_bond_string_radial_files/traj_movie", every=200, biased=True)
+#vis.animate_traj_projection_y(traj, "static_legendre_slip_bond_string_radial_files/traj_movie", every=200, biased=True)
 
 fig, ax = plt.subplots(dpi=300)
 ax.plot(t, traj[:, 0])
 ax.set_ylim([-10, 12])
 ax.set_xlabel("t")
 ax.set_ylabel("x")
-fig.savefig("static_legendre_slip_bond_string_path_files/ts_x.png")
+fig.savefig("static_legendre_slip_bond_string_radial_files/ts_x.png")
 
 fig, ax = plt.subplots(dpi=300)
 ax.plot(t, traj[:, 1])
 ax.set_ylim([-8, 10])
 ax.set_xlabel("t")
 ax.set_ylabel("y")
-fig.savefig("static_legendre_slip_bond_string_path_files/ts_y.png")
-
-
+fig.savefig("static_legendre_slip_bond_string_radial_files/ts_y.png")

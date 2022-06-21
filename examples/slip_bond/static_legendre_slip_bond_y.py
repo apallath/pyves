@@ -22,7 +22,7 @@ pot = SlipBondPotential2D()
 temp = 300
 vis = VisualizePotential2D(pot, temp=temp,
                            xrange=[-8, 10], yrange=[-4, 6],
-                           contourvals=61)
+                           contourvals=21, clip=20)
 
 # 1D projection along y
 _, _, y, Fy = vis.plot_projection_y()
@@ -155,7 +155,7 @@ if run_sim:
 
     # Call simulation
     sim(nsteps=10 * 100000,  # run x ns simulation
-        chkevery=10000,
+        chkevery=5 * 10000,
         trajevery=1,
         energyevery=1,
         chkfile="static_legendre_slip_bond_y_files/chk_state.dat",

@@ -42,7 +42,7 @@ if fit_nn:
 
     x = torch.tensor(x).unsqueeze(-1)
     Fx = torch.tensor(Fx)
-    nn_fn = LegendreBasis1D(8, min=-3, max=6, axis='x', weights=None)
+    nn_fn = LegendreBasis1D(12, min=-3, max=6, axis='x', weights=None)
 
     loss_fn = torch.nn.MSELoss()
     optimizer = torch.optim.Adam(nn_fn.parameters(), lr=1e-1)
@@ -109,7 +109,7 @@ else:
 vis = VisualizePotential2D(pot, temp=temp,
                            xrange=[-8, 10], yrange=[-6, 8],
                            contourvals=21, 
-                           bias=LegendreBasis1D(8, min=-3, max=6, axis='x', weights=weights),
+                           bias=LegendreBasis1D(12, min=-3, max=6, axis='x', weights=weights),
                            clip=20)
 
 # 2D surface
@@ -150,13 +150,13 @@ if run_sim:
     sim = SingleParticleSimulation(pot, temp=temp, init_coord=init_coord, cpu_threads=1, traj_in_mem=False)
 
     # Begin: Initialize static bias
-    V_module = LegendreBasis1D(8, min=-3, max=6, axis='x', weights=weights)
+    V_module = LegendreBasis1D(12, min=-3, max=6, axis='x', weights=weights)
     ves_bias = StaticBias_SingleParticle(V_module, model_loc="static_legendre_slip_bond_x_files/model.pt")
     sim.init_ves(ves_bias, static=True, startafter=500)
 
     # Call simulation
     sim(nsteps=10 * 100000,  # run x ns simulation
-        chkevery=10000,
+        chkevery=5 * 10000,
         trajevery=1,
         energyevery=1,
         chkfile="static_legendre_slip_bond_x_files/chk_state.dat",

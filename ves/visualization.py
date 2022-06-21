@@ -207,7 +207,9 @@ class VisualizePotential2D:
         ax.set_ylabel(r"Potential ($k_B T$)")
         ax.set_xlabel("$x$")
         _, top = ax.get_ylim()
-        ax.set_ylim([0, min(top, self.clip)])
+        if self.clip is not None:
+            top = min(top, self.clip)
+        ax.set_ylim([0, top])
         return (fig, ax, x, Fx)
 
     def plot_projection_y(self, biased=False):
@@ -241,7 +243,9 @@ class VisualizePotential2D:
         ax.set_ylabel(r"Potential ($k_B T$)")
         ax.set_xlabel("$y$")
         _, top = ax.get_ylim()
-        ax.set_ylim([0, min(top, self.clip)])
+        if self.clip is not None:
+            top = min(top, self.clip)
+        ax.set_ylim([0, top])
         return (fig, ax, y, Fy)
 
     def scatter_traj(self, traj, outimg, every=1, s=1, c='black', **plotkwargs):
